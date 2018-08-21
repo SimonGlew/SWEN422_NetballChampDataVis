@@ -1,8 +1,8 @@
 const parse = require('papaparse'),
     fs = require('fs')
 
-const FILES = [{ file: './data_files/2008-Table1.csv', year: 2008 }, { file: './data_files/2009-Table1.csv', year: 2009 }, { file: './data_files/2010-Table1.csv', year: 2010 },
-{ file: './data_files/2011-Table1.csv', year: 2011 }, { file: './data_files/2012-Table1.csv', year: 2012 }, { file: './data_files/2013-Table1.csv', year: 2013 }];
+const FILES = [{ file: './server/data_files/2008-Table1.csv', year: 2008 }, { file: './server/data_files/2009-Table1.csv', year: 2009 }, { file: './server/data_files/2010-Table1.csv', year: 2010 },
+{ file: './server/data_files/2011-Table1.csv', year: 2011 }, { file: './server/data_files/2012-Table1.csv', year: 2012 }, { file: './server/data_files/2013-Table1.csv', year: 2013 }];
 
 const REGEX_PATTERN_BYE_TEAMS = /\sand\s/gm
 
@@ -25,7 +25,7 @@ function _csvFileParsed(data, year) {
             } else {
                 let homeScore = '', awayScore = ''
                 let splitOne = game.Score.split('-'), splitTwo = game.Score.split('–')
-                
+
                 if(splitOne.length == 2 || splitTwo.length == 2){
                     let split = splitOne.length == 2 ? splitOne.map(s => s.trim()) : splitTwo.map(s => s.trim())
                     homeScore = split[0], awayScore = split[1]
@@ -43,13 +43,13 @@ function _csvFileParsed(data, year) {
                 }
 
                 results[year].push({
-                    round: game.Round, 
-                    date: game.Date, 
-                    hTeam: game['Home Team'], 
+                    round: game.Round,
+                    date: game.Date,
+                    hTeam: game['Home Team'],
                     score: game.Score,
                     homeScore: parseInt(homeScore),
                     awayScore: parseInt(awayScore),
-                    aTeam: game['Away Team'], 
+                    aTeam: game['Away Team'],
                     venue: game.Venue,
                     winningTeam: parseInt(homeScore) > parseInt(awayScore) ? game['Home Team'] : game['Away Team']
                 })
