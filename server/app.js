@@ -16,8 +16,8 @@ app.get('/getResults', (req,res)=>{
 	res.send(dataLoader.getResults(year));
 })
 
-app.get('/getTeams', (req,res)=>{
-	res.send();
+app.get('/api/get/allTeams', (req,res)=>{
+	res.send({ teams: dataLoader.getAllTeams() });
 })
 
 app.listen(config.port, (err) => {

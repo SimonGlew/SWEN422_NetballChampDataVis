@@ -6,7 +6,8 @@ const FILES = [{ file: './server/data_files/2008-Table1.csv', year: 2008 }, { fi
 
 const REGEX_PATTERN_BYE_TEAMS = /\sand\s/gm
 
-let results = { 2008: [], 2009: [], 2010: [], 2011: [], 2012: [], 2013: [] }
+let results = { 2008: [], 2009: [], 2010: [], 2011: [], 2012: [], 2013: [] },
+    teams = new Set()
 
 function loadData() {
     FILES.forEach(f => {
@@ -41,6 +42,9 @@ function _csvFileParsed(data, year) {
                     let split = game.Score.split('(')[0].trim().split('–').map(s => s.trim())
                     homeScore = split[0], awayScore = split[0]
                 }
+
+                teams.add(game['Home Team'])
+                teams.add(game['Away Team'])
 
                 results[year].push({
                     round: game.Round,
@@ -92,7 +96,12 @@ function getResults(year) {
     return results
 }
 
+function getAllTeams(){
+    return [...teams]
+}
+
 module.exports = {
     loadData: loadData,
+    getAllTeams: getAllTeams,
     getResults: getResults
 }
