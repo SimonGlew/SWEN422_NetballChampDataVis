@@ -20,6 +20,29 @@ app.get('/api/get/allTeams', (req,res)=>{
 	res.send({ teams: dataLoader.getAllTeams() });
 })
 
+app.get('/api/get/rivalsInformation', (req,res)=>{
+	if(!req.query.team){
+		res.send("ERR");
+	}
+	else{
+		res.send(dataLoader.getRivalsInformation(req.query.team));
+
+	}
+})
+
+app.get('/api/get/previousGamesVS', (req,res)=>{
+	if(!req.query.team){
+		res.send("ERR");
+	}
+	else if(!req.query.vsTeam){
+		res.send("ERR");
+	}
+	else{
+		res.send(dataLoader.getPreviousGamesVS(req.query.team,req.query.vsTeam))
+	}
+
+})
+
 app.listen(config.port, (err) => {
   if (err) {
     return console.log('something bad happened', err)

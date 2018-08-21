@@ -100,8 +100,21 @@ function getAllTeams(){
     return [...teams]
 }
 
+//Please simon give me this bad boi, pass you a team, you give back this shit for all other teams <3
+function getRivalsInformation(team){
+  return JSON.parse(' [ { "name":"Chiefs", "winrateVS":"30%", "totalPointsDiff":"-13", "isRival":true }, { "name":"Central Pulse", "winrateVS":"56%", "totalPointsDiff":"57", "isRival":true }, { "name":"Voluptous Vultures", "winrateVS":"5%", "totalPointsDiff":"-270", "isRival":true } ] ');
+}
+
+//Please simon give me shit like below, sorted by date order is CRUCIAL, catch you tmoz night <3
+
+function getPreviousGamesVS(team, vsTeam){
+  return JSON.parse(' [ {"round":"1","date":"Saturday 5 April","team":"Melbourne Vixens", "vsTeam":"Central Pulse", "wasHome":false, "pointsDiff":25,"venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"}, {"round":"1","date":"Saturday 5 April","team":"Melbourne Vixens", "vsTeam":"Central Pulse", "wasHome":false, "pointsDiff":-35,"venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"} ] ');
+}
+
 module.exports = {
     loadData: loadData,
     getAllTeams: getAllTeams,
-    getResults: getResults
+    getResults: getResults,
+    getRivalsInformation: getRivalsInformation,
+    getPreviousGamesVS:getPreviousGamesVS
 }
