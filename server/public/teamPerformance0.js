@@ -80,8 +80,6 @@ TeamPerformance.loadPerformanceRow = function(){
   gXAxis.call(xAxis);
   gYAxis.call(yAxis);
 
-  var currYear = 2008;
-
   //Add rectangles for zooming in mouse interaction
   gMouseListener.selectAll("rect")
     .data(years)
@@ -116,7 +114,7 @@ TeamPerformance.loadPerformanceRow = function(){
 
       gXAxis.transition()
         .duration(300)
-        .call(xAxis.ticks(years.length))
+        .call(xAxis.ticks(1))
 
       d3.selectAll(".marker")
         .transition()
@@ -128,7 +126,6 @@ TeamPerformance.loadPerformanceRow = function(){
         .transition()
         .duration(1000)
         .attrTween('d', function () {
-          currYear = d;
           return d3.interpolatePath(line(yearlyPlacing), roundLine(roundPlacing[d]));
         });
 
@@ -169,7 +166,7 @@ TeamPerformance.loadPerformanceRow = function(){
           .datum(yearlyPlacing)
           .transition()
           .attrTween('d', function () {
-            return d3.interpolatePath(roundLine(roundPlacing[currYear]), line(yearlyPlacing));
+            return d3.interpolatePath(roundLine(roundPlacing), line(yearlyPlacing));
           });
         d3.selectAll(".zoom-in")
           .style("pointer-events", "all")
