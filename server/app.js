@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var config = require('./config')
 
-let dataLoader = require('./handlers/dataHandler')
+let dataLoader = require('./handlers/ultimateDataHandler')
 dataLoader.loadData()
 
 app.use('/', express.static(__dirname+'/public'));
