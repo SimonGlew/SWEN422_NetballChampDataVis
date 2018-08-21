@@ -24,24 +24,24 @@
 
 
 
-        </div>
-        <div class="col-sm-4">
+      </div>
+      <div class="col-sm-4">
 
-        </div>
-      </nav>
+      </div>
+    </nav>
 
-      <div class="main container-fluid">
-        <div class="row">
-          <button class="btn btn-yoshi dropdown-toggle" type="button" data-toggle="dropdown">Team Select
-            <span class="caret"></span></button>
-            <div class="dropdown-menu systems-dropdown">
-              <a class="dropdown-item" href="#">Chiefs</a>
-              <a class="dropdown-item" href="#">Hurricanes</a>
-              <a class="dropdown-item" href="#">Crusaders</a>
-              <a class="dropdown-item" href="#">Blues</a>
-              <a class="dropdown-item" href="#">Highlanders</a>
+    <div class="main container-fluid">
+      <div class="row">
+        <button class="btn btn-yoshi dropdown-toggle" type="button" data-toggle="dropdown">Team Select
+          <span class="caret"></span></button>
+          <div class="dropdown-menu systems-dropdown">
+            <a class="dropdown-item" href="#">Chiefs</a>
+            <a class="dropdown-item" href="#">Hurricanes</a>
+            <a class="dropdown-item" href="#">Crusaders</a>
+            <a class="dropdown-item" href="#">Blues</a>
+            <a class="dropdown-item" href="#">Highlanders</a>
 
-            </div>
+          </div>
         </div>
         <div id="team-performance-container" class="row">
           <svg class="team-performance-chart"/>
@@ -51,20 +51,33 @@
 
         </div>
         <div id="rival-comparison-container" class="row">
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">Team</th>
-                <th scope="col">Winrate VS</th>
-                <th scope="col">Points Diff</th>
-              </tr>
-              <tbody class="rival-table-body">
+          <div class="table-wrapper col-sm-5">
+            <h3>Opposition Comparisons</h3>
+            <div class="rival-check form-check">
+              <input class="form-check-input" type="checkbox" value="" id="rival-check">
+              <label class="form-check-label" for="rival-check">
+                Show Rivals Only
+              </label>
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Team</th>
+                  <th scope="col">Winrate VS</th>
+                  <th scope="col">Points Diff</th>
+                </tr>
+                <tbody class="rival-table-body">
 
-              </tbody>
-            </thead>
-          </table>
+                </tbody>
+              </thead>
+            </table>
+          </div>
+          <div class="rival-chart-wrapper col-sm-7">
+            <!-- <svg class="rival-comparison-chart"></svg> -->
 
+          </div>
         </div>
+
       </div>
 
       <script src="./teamPerformance.js"></script>

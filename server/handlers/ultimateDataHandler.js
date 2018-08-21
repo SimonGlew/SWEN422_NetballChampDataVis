@@ -105,10 +105,10 @@ function getRivalsInformation(team){
   return JSON.parse(' [ { "name":"Chiefs", "winrateVS":"30%", "totalPointsDiff":"-13", "isRival":true }, { "name":"Central Pulse", "winrateVS":"56%", "totalPointsDiff":"57", "isRival":true }, { "name":"Voluptous Vultures", "winrateVS":"5%", "totalPointsDiff":"-270", "isRival":true } ] ');
 }
 
-//Please simon give me just the round jsons for team with vsTeam, sorted by date order is CRUCIAL, catch you tmoz night <3
+//Please simon give me shit like below, sorted by date order is CRUCIAL, catch you tmoz night <3
 
 function getPreviousGamesVS(team, vsTeam){
-  return JSON.parse(' [ {"round":"1","date":"Saturday 5 April","hTeam":"Central Pulse","score":"33–50","homeScore":33,"awayScore":50,"aTeam":"Melbourne Vixens","venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"}, {"round":"2","date":"Sunday 13 April","hTeam":"Melbourne Vixens","score":"62–52","homeScore":62,"awayScore":52,"aTeam":"Central Pulse","venue":"State Netball and Hockey Centre,Melbourne","winningTeam":"Melbourne Vixens"} ] ');
+  return JSON.parse(' [ {"round":"1","date":"Saturday 5 April","team":"Melbourne Vixens", "vsTeam":"Central Pulse", "wasHome":false, "pointsDiff":25,"venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"}, {"round":"1","date":"Saturday 5 April","team":"Melbourne Vixens", "vsTeam":"Central Pulse", "wasHome":false, "pointsDiff":-35,"venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"} ] ');
 }
 
 module.exports = {

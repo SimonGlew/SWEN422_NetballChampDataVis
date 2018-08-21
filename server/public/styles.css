@@ -55,3 +55,8 @@ fieldset[disabled] .btn-yoshi.active {
   color: #33D6AD;
   background-color: #FFFFFF;
 }
+
+.rival-check{
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
