@@ -5,4 +5,9 @@ $(document).ready(function(){
 
 function init(){
   console.log("init");
+
+
+  TeamPerformance.loadPerformanceRow();
+  RivalComparison.loadRivalComparisonRow();
+  VenueComparison.loadVenueComparisonRow();
 }
