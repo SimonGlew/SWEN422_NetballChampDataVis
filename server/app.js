@@ -11,7 +11,7 @@ app.get('/', (req,res)=>{
 	res.sendFile('index.html');
 });
 
-app.get('api/get/results', (req,res)=>{
+app.get('/api/get/results', (req,res)=>{
 	var year = req.query.year;
 	res.send(dataLoader.getResults(year));
 })
