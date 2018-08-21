@@ -1,0 +1,57 @@
+.navbar{
+  background-color: #33d6ad;
+}
+
+body{
+  /* background-color: #48c7f2; */
+}
+
+.main{
+  padding: 20px 75px;
+}
+
+.btn-yoshi {
+  color: #FFFFFF;
+  background-color: #33D6AD;
+  border-color: #33D6AD;
+}
+
+.btn-yoshi:hover,
+.btn-yoshi:focus,
+.btn-yoshi:active,
+.btn-yoshi.active,
+.open .dropdown-toggle.btn-yoshi {
+  color: #FFFFFF;
+  background-color: #33D6AD;
+  border-color: #33D6AD;
+}
+
+.btn-yoshi:active,
+.btn-yoshi.active,
+.open .dropdown-toggle.btn-yoshi {
+  background-image: none;
+}
+
+.btn-yoshi.disabled,
+.btn-yoshi[disabled],
+fieldset[disabled] .btn-yoshi,
+.btn-yoshi.disabled:hover,
+.btn-yoshi[disabled]:hover,
+fieldset[disabled] .btn-yoshi:hover,
+.btn-yoshi.disabled:focus,
+.btn-yoshi[disabled]:focus,
+fieldset[disabled] .btn-yoshi:focus,
+.btn-yoshi.disabled:active,
+.btn-yoshi[disabled]:active,
+fieldset[disabled] .btn-yoshi:active,
+.btn-yoshi.disabled.active,
+.btn-yoshi[disabled].active,
+fieldset[disabled] .btn-yoshi.active {
+  background-color: #33D6AD;
+  border-color: #33D6AD;
+}
+
+.btn-yoshi .badge {
+  color: #33D6AD;
+  background-color: #FFFFFF;
+}
