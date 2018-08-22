@@ -59,6 +59,7 @@ fieldset[disabled] .btn-yoshi.active {
 .rival-check{
   padding-top: 10px;
   padding-bottom: 10px;
+  padding-left: 40px;
 }
 
 .axis path, .axis line {
@@ -73,4 +74,12 @@ fieldset[disabled] .btn-yoshi.active {
 
 .bar-home{
   fill:#70a7ff;
+}
+
+.clicked-row{
+  background-color: #d3f6ff;
+}
+
+thead{
+  background-color: #d4d5d6;
 }

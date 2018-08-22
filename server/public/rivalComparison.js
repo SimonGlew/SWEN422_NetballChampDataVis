@@ -2,19 +2,24 @@ RivalComparison = {};
 
 RivalComparison.loadRivalComparisonRow = function(){
   console.log("Loading Rival data...");
+
+
+
   var team = "Melbourne Vixens";
   var vsTeam = "Central Pulse";
-  RivalComparison.loadRivalsTable(team);
-  RivalComparison.loadPreviousGamesChart(team, vsTeam);
+  RivalComparison.loadRivalsTable(team, 2008, 2009);
+  RivalComparison.loadPreviousGamesChart(team, vsTeam, 2008, 2009);
 }
 
-RivalComparison.loadRivalsTable = function(team){
-  $.get('api/get/rivalsInformation?team='+team, function(res){
+RivalComparison.loadRivalsTable = function(team, startYear, endYear, finals){
+  $.get('api/get/rivalsInformation?team='+team+ '&startYear='+startYear + '&endYear='+endYear + "&finals="+finals, function(res){
     console.log("Get rival teams info", res);
     if(res){
       var tBody = $('.rival-table-body');
       res.forEach((e) =>{
         var tr = $('<tr></tr>');
+        tr.addClass("clickable-row");
+        tr.css("cursor", "pointer")
 
         var name = $('<td></td>');
         name.text(e.name);
@@ -33,22 +38,31 @@ RivalComparison.loadRivalsTable = function(team){
       })
     }
 
+    tBody.on('click', '.clickable-row', function(e){
+      // $(".clickable-row").removeClass('bg-info');
+      $(this).addClass('clicked-row').siblings().removeClass('clicked-row');
+    })
+
   })
 }
 // /{"round":"1","date":"Saturday 5 April","hTeam":"Central Pulse","score":"33–50","homeScore":33,"awayScore":50,"aTeam":"Melbourne Vixens","venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"}
-RivalComparison.loadPreviousGamesChart = function(team, vsTeam){
-  $.get('/api/get/previousGamesVS?team='+team+'&vsTeam='+vsTeam, function(res){
+RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYear, finals){
+  $.get('/api/get/previousGamesVS?team='+team+'&vsTeam='+vsTeam+'&startYear='+startYear + '&endYear='+endYear+"&finals="+finals, function(res){
     console.log("got prev games info",res);
+
+    //TeamA Points Differential VS TeamB, startYear - endYear
     // var BWIDTH = 50;
+
+    var title = team +" Points Differential VS "+vsTeam + ", years "+startYear +" - "+endYear;
     var data = res;
     var margin = {
-      top:10,
+      top:50,
       right:10,
       bottom:20,
       left:30
     },
     width = $('.rival-chart-wrapper').width() - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+    height = 500 - margin.top - margin.bottom;
 
     var y = d3.scaleLinear()
     .range([height, 0])
@@ -130,7 +144,16 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam){
       .attr("width", x.bandwidth())
       .attr("height", function(d){
         return Math.abs(y(d.pointsDiff) - y(0));
-      })
+      });
+
+      svg.append("text")
+        .attr("x", (width/2))
+        .attr("y", (margin.top /2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("text-decoration", "underline")
+        .text(title);
+
 
   })
 }
