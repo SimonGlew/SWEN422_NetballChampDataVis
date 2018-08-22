@@ -7,7 +7,8 @@ const FILES = [{ file: './server/data_files/2008-Table1.csv', year: 2008 }, { fi
 const REGEX_PATTERN_BYE_TEAMS = /\sand\s/gm
 
 let results = { 2008: [], 2009: [], 2010: [], 2011: [], 2012: [], 2013: [] },
-    teams = new Set()
+    resultsTable = null
+teams = new Set()
 
 function loadData() {
     FILES.forEach(f => {
@@ -27,7 +28,7 @@ function _csvFileParsed(data, year) {
                 let homeScore = '', awayScore = ''
                 let splitOne = game.Score.split('-'), splitTwo = game.Score.split('–')
 
-                if(splitOne.length == 2 || splitTwo.length == 2){
+                if (splitOne.length == 2 || splitTwo.length == 2) {
                     let split = splitOne.length == 2 ? splitOne.map(s => s.trim()) : splitTwo.map(s => s.trim())
                     homeScore = split[0], awayScore = split[1]
                     if (isNaN(parseInt(homeScore)) || isNaN(parseInt(awayScore))) {
@@ -38,7 +39,7 @@ function _csvFileParsed(data, year) {
                             awayScore = awayScore.split(' ')[1]
                         }
                     }
-                }else {
+                } else {
                     let split = game.Score.split('(')[0].trim().split('–').map(s => s.trim())
                     homeScore = split[0], awayScore = split[0]
                 }
@@ -96,25 +97,93 @@ function getResults(year) {
     return results
 }
 
-function getAllTeams(){
+function getAllTeams() {
     return [...teams]
 }
 
 //Please simon give me this bad boi, pass you a team, you give back this shit for all other teams <3
-function getRivalsInformation(team){
-  return JSON.parse(' [ { "name":"Chiefs", "winrateVS":"30%", "totalPointsDiff":"-13", "isRival":true }, { "name":"Central Pulse", "winrateVS":"56%", "totalPointsDiff":"57", "isRival":true }, { "name":"Voluptous Vultures", "winrateVS":"5%", "totalPointsDiff":"-270", "isRival":true } ] ');
+function getRivalsInformation(team) {
+    return JSON.parse(' [ { "name":"Chiefs", "winrateVS":"30%", "totalPointsDiff":"-13", "isRival":true }, { "name":"Central Pulse", "winrateVS":"56%", "totalPointsDiff":"57", "isRival":true }, { "name":"Voluptous Vultures", "winrateVS":"5%", "totalPointsDiff":"-270", "isRival":true } ] ');
 }
 
 //Please simon give me shit like below, sorted by date order is CRUCIAL, catch you tmoz night <3
 
-function getPreviousGamesVS(team, vsTeam){
-  return JSON.parse(' [ {"round":"1","date":"Saturday 5 April","team":"Melbourne Vixens", "vsTeam":"Central Pulse", "wasHome":false, "pointsDiff":25,"venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"}, {"round":"1","date":"Saturday 5 April","team":"Melbourne Vixens", "vsTeam":"Central Pulse", "wasHome":false, "pointsDiff":-35,"venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"} ] ');
+function getPreviousGamesVS(team, vsTeam) {
+    return JSON.parse(' [ {"round":"1","date":"Saturday 5 April","team":"Melbourne Vixens", "vsTeam":"Central Pulse", "wasHome":false, "pointsDiff":25,"venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"}, {"round":"1","date":"Saturday 5 April","team":"Melbourne Vixens", "vsTeam":"Central Pulse", "wasHome":false, "pointsDiff":-35,"venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"} ] ');
 }
+
+function getTeamResults(team) {
+    if (!resultsTable) {
+        _makeResultTable()
+    }
+    let teamPlacing = { 2008: [], 2009: [], 2010: [], 2011: [], 2012: [], 2013: [] }
+}
+
+function _makeResultTable() {
+    resultsTable = { 2008: {}, 2009: {}, 2010: {}, 2011: {}, 2012: {}, 2013: {} }
+
+    Object.keys(results).forEach(year => {
+        results[year].forEach((game, index) => {
+            if (index + 4 < results[year].length) {
+                let round = parseInt(game.round)
+                if (!resultsTable[year][String(round)] || !resultsTable[year][String(round)].length)
+                    resultsTable[year][String(round)] = []
+                if (round > 1) {
+                    if (!game.bye) {
+                        let indexHome = (resultsTable[year][String(round - 1)]).map(r => r.team).indexOf(game.hTeam)
+                        let indexAway = (resultsTable[year][String(round - 1)]).map(r => r.team).indexOf(game.aTeam)
+
+                        let prevHomeTeam = resultsTable[year][String(round - 1)][indexHome]
+                        let prevAwayTeam = resultsTable[year][String(round - 1)][indexAway]
+
+                        let homeTeamPoints = (prevHomeTeam ? prevHomeTeam.points : 0) + (game.homeScore > game.awayScore ? 2 : 0)
+                        let awayTeamPoints = (prevAwayTeam ? prevAwayTeam.points : 0) + (game.homeScore > game.awayScore ? 0 : 2)
+
+                        let homePD = (prevHomeTeam ? prevHomeTeam.PD : 0) + (game.homeScore - game.awayScore)
+                        let awayPD = (prevAwayTeam ? prevAwayTeam.PD : 0) + (game.awayScore - game.homeScore)
+
+                        resultsTable[year][game.round].push({ team: game.hTeam, points: homeTeamPoints, PD: homePD })
+                        resultsTable[year][game.round].push({ team: game.aTeam, points: awayTeamPoints, PD: awayPD })
+                    } else {
+                        let index = resultsTable[year][String(round - 1)].map(r => r.team).indexOf(game.team)
+                        resultsTable[year][round].push(resultsTable[year][String(round - 1)][index])
+                    }
+                } else {
+                    //first round
+                    let homeTeamPoints = (game.homeScore > game.awayScore ? 2 : 0)
+                    let awayTeamPoints = (game.homeScore > game.awayScore ? 0 : 2)
+
+                    let homePD = (game.homeScore - game.awayScore)
+                    let awayPD = (game.awayScore - game.homeScore)
+
+                    resultsTable[year][round].push({ team: game.hTeam, points: homeTeamPoints, PD: homePD })
+                    resultsTable[year][round].push({ team: game.aTeam, points: awayTeamPoints, PD: awayPD })
+                }
+            }
+        })
+        Object.keys(resultsTable[year]).forEach(round => {
+            resultsTable[year][round].sort((a, b) => {
+                if (a.points != b.points) return b.points - a.points
+                else return b.PD - a.PD
+            })
+        })
+        //length - 4 SEMI ONE - ROUND SF
+        //length - 3 SEMI TWO - ROUND SF
+        //length - 2 THING BEFORE FINAL - ROUND BF
+        //length - 1 FINAL - ROUND F
+
+    })
+
+}
+
+
+
 
 module.exports = {
     loadData: loadData,
     getAllTeams: getAllTeams,
     getResults: getResults,
     getRivalsInformation: getRivalsInformation,
-    getPreviousGamesVS:getPreviousGamesVS
+    getPreviousGamesVS: getPreviousGamesVS,
+    getTeamResults: getTeamResults
 }
