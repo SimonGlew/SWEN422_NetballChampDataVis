@@ -44,7 +44,7 @@ function createGraph(data){
 
 
   //Set width and height of chart svg
-  let width = container.node().getBoundingClientRect().width;
+  let width = container.node().getBoundingClientRect().width/2;
   let height = 400;
 
   //Set svg width to container width and arbitrary height
@@ -142,6 +142,27 @@ function createGraph(data){
   gXAxis.call(xAxis);
   gYAxis.call(yAxis);
 
+  svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0)
+    .attr("x", - (height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Placing");
+
+  svg.append("text")
+    .attr("id", "yLabel")
+    .attr("transform", "translate(" + (width/2) + " ," + (height - margin/3) + ")")
+    .style("text-anchor", "middle")
+    .text("Year");
+
+   svg.append("text")
+    .attr("transform", "translate(" + (width/2) + " ," + (margin/3) + ")")
+    .style("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .style("text-decoration", "underline")
+    .text("Final Placings of Central Pulse")
+
 
   //Add rectangles for zooming in mouse interaction
   gMouseListener.selectAll("rect")
@@ -182,6 +203,10 @@ function createGraph(data){
       updateXRoundLabelScale(i);
       xScale.domain(d3.extent(years))
 
+      d3.select("#yLabel")
+        .transition()
+        .duration(dur/2)
+        .style("opacity", 0)
 
       gXLabelAxis.transition()
         .call(xLabelAxis);
@@ -221,6 +246,13 @@ function createGraph(data){
           gXAxis.transition()
             .duration(dur/2)
             .style("opacity", 0);
+
+          d3.select("#yLabel")
+            .text("Rounds (" +  years[currYear] + ")")
+            .transition()
+            .duration(dur/2)
+            .style("opacity", 1)
+
 
         });
 
@@ -280,13 +312,27 @@ function createGraph(data){
           .attr("cx", function(d, i){
             return xScale(d.year);
           })
+          .on("end", function(){
+            d3.select("#yLabel")
+              .text("Year")
+              .transition()
+              .duration(dur/2)
+              .style("opacity", 1)
 
-          d3.select("#line")
-            .transition()
-            .duration(dur)
-            .attrTween('d', function (d) {
-              return d3.interpolatePath(roundLine(roundData), line(yearData));
-            })
+          })
+
+
+        d3.select("#yLabel")
+          .transition()
+          .duration(dur/2)
+          .style("opacity", 0)
+
+        d3.select("#line")
+          .transition()
+          .duration(dur)
+          .attrTween('d', function (d) {
+            return d3.interpolatePath(roundLine(roundData), line(yearData));
+          })
 
 
         d3.selectAll(".zoom-in")
