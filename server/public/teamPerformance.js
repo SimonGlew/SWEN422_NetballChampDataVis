@@ -12,18 +12,23 @@ TeamPerformance.loadPerformanceRow = function(){
   numTeams = 10;
   numRounds = 17;
 
-  yearlyPlacing = []
-  roundPlacing = {}
+  data = [];
+
   for(var i = 0; i < years.length; i++){
-    yearlyPlacing[i] = Math.floor(Math.random()*10) + 1
-    roundPlacing[years[i]] = [];
-    for(var j = 0; j < 16; j++){
-      roundPlacing[years[i]].push(Math.floor(Math.random()*10) + 1)
+    yearObj = {
+      year: years[i],
+      placement: Math.floor(Math.random()*10) + 1,
+      rounds: []
     }
-    roundPlacing[years[i]].push(yearlyPlacing[i])
+    for(var j = 1; j <= numRounds; j++){
+      yearObj.rounds.push({
+        round: j,
+        placement: Math.floor(Math.random()*10) + 1
+      })
+    }
+    data.push(yearObj)
   }
-  console.log(yearlyPlacing)
-  console.log(roundPlacing)
+  console.log(data)
   //References for container div and chart svg.
   let container = d3.select("#team-performance-container");
   let svg = d3.select(".team-performance-chart");
@@ -112,7 +117,7 @@ TeamPerformance.loadPerformanceRow = function(){
     })
     .on("click", function(d){
       console.log("Zoom into " + d)
-      // xScale.domain([d-1, d])
+      xScale.domain([d-1, d])
 
       gXAxis.transition()
         .duration(300)
@@ -123,14 +128,18 @@ TeamPerformance.loadPerformanceRow = function(){
         .attr("cx", function(d, i){
           return xScale(years[i]);
         })
-      d3.select("#line")
-        .datum(roundPlacing)
+
+        d3.select("#line")
         .transition()
-        .duration(1000)
-        .attrTween('d', function () {
-          currYear = d;
-          return d3.interpolatePath(line(yearlyPlacing), roundLine(roundPlacing[d]));
-        });
+          .attr("d", line)
+      // d3.select("#line")
+      //   .datum(roundPlacing)
+      //   .transition()
+      //   .duration(1000)
+      //   .attrTween('d', function () {
+      //     currYear = d;
+      //     return d3.interpolatePath(line(yearlyPlacing), roundLine(roundPlacing[d]));
+      //   });
 
       d3.select(".zoom-out")
         .style("pointer-events", "all")
@@ -163,14 +172,22 @@ TeamPerformance.loadPerformanceRow = function(){
         d3.selectAll(".marker")
           .transition()
           .attr("cx", function(d, i){
-            return xScale(years[i]);
+            return xScale(d.year);
           })
-        d3.select("#line")
-          .datum(yearlyPlacing)
-          .transition()
-          .attrTween('d', function () {
-            return d3.interpolatePath(roundLine(roundPlacing[currYear]), line(yearlyPlacing));
-          });
+
+          d3.select("#line")
+            .transition()
+            .attr("d", line)
+
+
+        // d3.select("#line")
+        //   .datum(yearlyPlacing)
+        //   .transition()
+        //   .attrTween('d', function () {
+        //     return d3.interpolatePath(roundLine(roundPlacing[currYear]), line(yearlyPlacing));
+        //   });
+
+
         d3.selectAll(".zoom-in")
           .style("pointer-events", "all")
           .style("opacity", 1)
@@ -190,8 +207,8 @@ TeamPerformance.loadPerformanceRow = function(){
         .attr("height", height-margin)
 
     var line = d3.line()
-      .x(function(d, i) { return xScale(years[i]); })
-      .y(function(d) { return yScale(d); })
+      .x(function(d, i) { return xScale(d.year); })
+      .y(function(d) { return yScale(d.placement); })
       .curve(d3.curveCardinal)
 
     var roundLine = d3.line()
@@ -200,7 +217,7 @@ TeamPerformance.loadPerformanceRow = function(){
       .curve(d3.curveCardinal)
 
     gMarkers.append("path")
-      .datum(yearlyPlacing)
+      .datum(data)
       .attr("id", "line")
       .attr("d", line)
       .attr("fill", "none")
@@ -211,16 +228,16 @@ TeamPerformance.loadPerformanceRow = function(){
       .attr("clip-path", "url(#marker-clip)");
 
     gMarkers.selectAll("circle")
-      .data(yearlyPlacing)
+      .data(data)
       .enter()
       .append("circle")
         .attr("class", "marker")
         .attr("r", 6)
         .attr("cx", function(d, i){
-          return xScale(years[i]);
+          return xScale(d.year);
         })
         .attr("cy", function(d){
-          return yScale(d);
+          return yScale(d.placement);
         })
         .attr("fill", "#5697ff")
         .attr("clip-path", "url(#marker-clip)");
