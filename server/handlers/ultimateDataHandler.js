@@ -112,11 +112,46 @@ function getPreviousGamesVS(team, vsTeam) {
     return JSON.parse(' [ {"round":"1","date":"Saturday 5 April","team":"Melbourne Vixens", "vsTeam":"Central Pulse", "wasHome":false, "pointsDiff":25,"venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"}, {"round":"1","date":"Saturday 5 April","team":"Melbourne Vixens", "vsTeam":"Central Pulse", "wasHome":false, "pointsDiff":-35,"venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"} ] ');
 }
 
+function getVenues(team) {
+    let venues = { home: {}, away: {} }
+
+    Object.keys(results).forEach(year => {
+        results[year].filter(r => r.hTeam == team).forEach(homeGame => {
+
+        })
+        results[year].filter(r => r.aTeam == team).forEach(awayGame => {
+
+        })
+    })
+}
+
 function getTeamResults(team) {
     if (!resultsTable) {
         _makeResultTable()
     }
-    let teamPlacing = { 2008: [], 2009: [], 2010: [], 2011: [], 2012: [], 2013: [] }
+
+    team = 'Adelaide Thunderbirds'
+
+    let teamPlacing = []
+
+    Object.keys(resultsTable).forEach(year => {
+        let yearObj = { placement: 0, rounds: [], year: parseInt(year) }
+        Object.keys(resultsTable[year]).forEach((roundNumber, index) => {
+            let roundPlacement = resultsTable[year][roundNumber].map(r => r.team).indexOf(team)
+
+            yearObj.rounds.push({ round: parseInt(roundNumber), placement: roundPlacement + 1 })
+
+            if (index == Object.keys(resultsTable[year]).length - 1) yearObj.placement = roundPlacement + 1
+        })
+
+        yearObj.rounds.sort((a, b) => a.round - b.round)
+        teamPlacing.push(yearObj)
+    })
+    teamPlacing.sort((a, b) => a.year - b.year)
+
+    //console.log(JSON.stringify(teamPlacing, null, 2))
+
+
 }
 
 function _makeResultTable() {
@@ -130,6 +165,9 @@ function _makeResultTable() {
                     resultsTable[year][String(round)] = []
                 if (round > 1) {
                     if (!game.bye) {
+                        if((game.hTeam == 'Adelaide Thunderbirds' || game.aTeam == 'Adelaide Thunderbirds') && year == '2011'){
+                            console.log(game)
+                        }
                         let indexHome = (resultsTable[year][String(round - 1)]).map(r => r.team).indexOf(game.hTeam)
                         let indexAway = (resultsTable[year][String(round - 1)]).map(r => r.team).indexOf(game.aTeam)
 
@@ -161,17 +199,86 @@ function _makeResultTable() {
                 }
             }
         })
+        let finalRound = [], finalRoundRound = null
         Object.keys(resultsTable[year]).forEach(round => {
             resultsTable[year][round].sort((a, b) => {
                 if (a.points != b.points) return b.points - a.points
                 else return b.PD - a.PD
             })
+            finalRound = resultsTable[year][round]
+            finalRoundRound = parseInt(round)
         })
-        //length - 4 SEMI ONE - ROUND SF
-        //length - 3 SEMI TWO - ROUND SF
-        //length - 2 THING BEFORE FINAL - ROUND BF
-        //length - 1 FINAL - ROUND F
 
+        let index = results[year].length
+        if (!resultsTable[year][finalRoundRound + 1] || !resultsTable[year][finalRoundRound + 1].length)
+            resultsTable[year][finalRoundRound + 1] = []
+        if (!resultsTable[year][finalRoundRound + 2] || !resultsTable[year][finalRoundRound + 2].length)
+            resultsTable[year][finalRoundRound + 2] = []
+        if (!resultsTable[year][finalRoundRound + 3] || !resultsTable[year][finalRoundRound + 3].length)
+            resultsTable[year][finalRoundRound + 3] = []
+
+        //FIRST SEMI
+        let winnerOne = results[year][index - 4].winningTeam
+        let loserOne = (results[year][index - 4].winningTeam == results[year][index - 4].hTeam ? results[year][index - 4].aTeam : results[year][index - 4].hTeam)
+        //SECOND SEMI
+        let winnerTwo = results[year][index - 3].winningTeam
+        let loserTwo = (results[year][index - 3].winningTeam == results[year][index - 3].hTeam ? results[year][index - 3].aTeam : results[year][index - 3].hTeam)
+
+        //WINNERS
+        r = finalRoundRound + 1
+        if (results[year][index - 2].aTeam == winnerOne) {
+            resultsTable[year][r][2] = { team: winnerOne }
+        } else {
+            resultsTable[year][r][0] = { team: winnerOne }
+        }
+
+        if (results[year][index - 2].aTeam == winnerTwo) {
+            resultsTable[year][r][2] = { team: winnerTwo }
+        } else {
+            resultsTable[year][r][0] = { team: winnerTwo }
+        }
+
+        //LOSERS
+        if (results[year][index - 2].hTeam == loserOne) {
+            resultsTable[year][r][1] = { team: loserOne }
+        } else {
+            resultsTable[year][r][3] = { team: loserOne }
+        }
+
+        if (results[year][index - 2].hTeam == loserTwo) {
+            resultsTable[year][r][1] = { team: loserTwo }
+        } else {
+            resultsTable[year][r][3] = { team: loserTwo }
+        }
+
+
+        finalRound.forEach((team, index) => {
+            if (index > 3) {
+                //if(year == '2011')            console.log(team)
+
+                resultsTable[year][finalRoundRound + 1][index] = team
+            }
+        })
+
+        resultsTable[year][finalRoundRound + 2][1] = { team: results[year][index - 2].winningTeam }
+        resultsTable[year][finalRoundRound + 2][2] = { team: (results[year][index - 2].winningTeam == results[year][index - 2].hTeam ? results[year][index - 2].aTeam : results[year][index - 2].hTeam) }
+
+
+        resultsTable[year][finalRoundRound + 1].forEach((team, index) => {
+            if (index > 2 || index == 0) {
+                resultsTable[year][finalRoundRound + 2][index] = team
+            }
+        })
+
+        resultsTable[year][finalRoundRound + 3][0] = { team: results[year][index - 1].winningTeam }
+        resultsTable[year][finalRoundRound + 3][1] = { team: (results[year][index - 1].winningTeam == results[year][index - 1].hTeam ? results[year][index - 1].aTeam : results[year][index - 1].hTeam) }
+
+        //ACTUAL FINAL
+        resultsTable[year][finalRoundRound + 2].forEach((team, index) => {
+            if (index > 1) {
+                resultsTable[year][finalRoundRound + 3][index] = team
+            }
+        })
     })
 
 }
