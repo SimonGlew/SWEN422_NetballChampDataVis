@@ -12,7 +12,11 @@ TeamPerformance.loadPerformanceRow = function(){
   numTeams = 10;
   numRounds = 17;
 
+  var currYear = 0;
+
+
   data = [];
+  roundsData = [];
 
   for(var i = 0; i < years.length; i++){
     yearObj = {
@@ -25,10 +29,11 @@ TeamPerformance.loadPerformanceRow = function(){
         round: j,
         placement: Math.floor(Math.random()*10) + 1
       })
+      roundsData.push({  round: j , placement: Math.floor(Math.random()*10) + 1 })
     }
     data.push(yearObj)
   }
-  console.log(data)
+
   //References for container div and chart svg.
   let container = d3.select("#team-performance-container");
   let svg = d3.select(".team-performance-chart");
@@ -56,7 +61,7 @@ TeamPerformance.loadPerformanceRow = function(){
     .range([margin, width-margin])
 
   let xRoundScale = d3.scaleLinear()
-    .domain([0, 17])
+    .domain([0, roundsData.length])
     .range([margin, width-margin])
 
   let yScale = d3.scaleLinear()
@@ -85,7 +90,6 @@ TeamPerformance.loadPerformanceRow = function(){
   gXAxis.call(xAxis);
   gYAxis.call(yAxis);
 
-  var currYear = 2008;
 
   //Add rectangles for zooming in mouse interaction
   gMouseListener.selectAll("rect")
@@ -115,13 +119,17 @@ TeamPerformance.loadPerformanceRow = function(){
     .on("mouseout", function(){
       d3.select(this).attr("fill", "#FFF")
     })
-    .on("click", function(d){
+    .on("click", function(d, i){
       console.log("Zoom into " + d)
-      xScale.domain([d-1, d])
+
+      currYear = i;
+
+      // xScale.domain([d-1, d])
+      // xRoundScale.domain([(currYear-1)*17, (currYear-1)*17 + 17])
 
       gXAxis.transition()
         .duration(300)
-        .call(xAxis.ticks(years.length))
+        .call(xAxis.ticks(1))
 
       d3.selectAll(".marker")
         .transition()
@@ -129,9 +137,18 @@ TeamPerformance.loadPerformanceRow = function(){
           return xScale(years[i]);
         })
 
-        d3.select("#line")
+      d3.select("#line")
         .transition()
-          .attr("d", line)
+        .attr("d", line)
+        .on("end", function(){
+          d3.select(this)
+            .transition()
+            .duration(1000)
+            .attrTween('d', function (d) {
+              console.log(d)
+              return d3.interpolatePath(line(d), roundLine(roundsData));
+            });
+        })
       // d3.select("#line")
       //   .datum(roundPlacing)
       //   .transition()
@@ -167,7 +184,7 @@ TeamPerformance.loadPerformanceRow = function(){
       })
       .on("click", function(d){
         console.log("Zoom out")
-        xScale.domain(d3.extent(years))
+        // xScale.domain(d3.extent(years))
         gXAxis.transition().call(xAxis.ticks(years.length));
         d3.selectAll(".marker")
           .transition()
@@ -177,15 +194,16 @@ TeamPerformance.loadPerformanceRow = function(){
 
           d3.select("#line")
             .transition()
-            .attr("d", line)
+            .attrTween('d', function (d) {
+              console.log(d)
+              return d3.interpolatePath(roundLine(roundsData), line(d));
+            });
 
 
         // d3.select("#line")
         //   .datum(yearlyPlacing)
         //   .transition()
-        //   .attrTween('d', function () {
-        //     return d3.interpolatePath(roundLine(roundPlacing[currYear]), line(yearlyPlacing));
-        //   });
+        //
 
 
         d3.selectAll(".zoom-in")
@@ -213,7 +231,7 @@ TeamPerformance.loadPerformanceRow = function(){
 
     var roundLine = d3.line()
       .x(function(d, i) { return xRoundScale(i); })
-      .y(function(d) { return yScale(d); })
+      .y(function(d) { return yScale(d.placement); })
       .curve(d3.curveCardinal)
 
     gMarkers.append("path")
