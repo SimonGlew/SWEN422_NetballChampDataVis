@@ -151,7 +151,7 @@ function getTeamResults(team) {
 
     //console.log(JSON.stringify(teamPlacing, null, 2))
 
-
+    return teamPlacing
 }
 
 function _makeResultTable() {
