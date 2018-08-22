@@ -109,9 +109,6 @@ function getAllTeams() {
 
 //Please simon give me this bad boi, pass you a team, you give back this shit for all other teams <3
 function getRivalsInformation(team, startYear, endYear, finals) {
-	team = 'Northern Mystics'
-	startYear = '2008'
-	endYear = '2012'
 	let otherTeams = {}
 
 	Object.keys(results).forEach(year => {
@@ -152,11 +149,6 @@ function getRivalsInformation(team, startYear, endYear, finals) {
 //Please simon give me shit like below, sorted by date order is CRUCIAL, catch you tmoz night <3
 
 function getPreviousGamesVS(team, vsTeam, startYear, endYear, finals) {
-	team = 'Northern Mystics'
-	vsTeam = 'Southern Steel'
-	startYear = '2008'
-	endYear = '2012'
-
 	let prevGames = []
 
 	Object.keys(results).forEach(year => {
