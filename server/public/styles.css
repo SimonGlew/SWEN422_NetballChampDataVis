@@ -60,3 +60,17 @@ fieldset[disabled] .btn-yoshi.active {
   padding-top: 10px;
   padding-bottom: 10px;
 }
+
+.axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.bar-away{
+  fill:#ff5959;
+}
+
+.bar-home{
+  fill:#70a7ff;
+}

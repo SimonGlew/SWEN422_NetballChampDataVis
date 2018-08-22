@@ -9,7 +9,7 @@ RivalComparison.loadRivalComparisonRow = function(){
 }
 
 RivalComparison.loadRivalsTable = function(team){
-  $.get('http://localhost:8000/api/get/rivalsInformation?team='+team, function(res){
+  $.get('api/get/rivalsInformation?team='+team, function(res){
     console.log("Get rival teams info", res);
     if(res){
       var tBody = $('.rival-table-body');
@@ -37,7 +37,7 @@ RivalComparison.loadRivalsTable = function(team){
 }
 // /{"round":"1","date":"Saturday 5 April","hTeam":"Central Pulse","score":"33–50","homeScore":33,"awayScore":50,"aTeam":"Melbourne Vixens","venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"}
 RivalComparison.loadPreviousGamesChart = function(team, vsTeam){
-  $.get('http://localhost:8000/api/get/previousGamesVS?team='+team+'&vsTeam='+vsTeam, function(res){
+  $.get('/api/get/previousGamesVS?team='+team+'&vsTeam='+vsTeam, function(res){
     console.log("got prev games info",res);
     // var BWIDTH = 50;
     var data = res;
@@ -52,15 +52,16 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam){
 
     var y = d3.scaleLinear()
     .range([height, 0])
-    .domain(d3.extent(data, function(d){
-      return d.pointsDiff;
-    }))
+    .domain([-100,100])
+    // .domain(d3.extent(data, function(d){
+    //   return d.pointsDiff;
+    // }))
 
     console.log(y(1))
 
-    var c = 0;
+
     var x = d3.scaleBand().rangeRound([0,width]).padding(0.1)
-    .domain(data.map((d)=>{return ++c;}))
+    .domain(data.map((d, i)=>{return i;}))
 
     // var xAxisScale = d3.scaleLinear()
     //   .domain([0,data.length])
@@ -80,6 +81,13 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam){
     .call(d3.axisBottom(x));
 
     g.append("g")
+    .attr("class", "x axis")
+    .append("line")
+    .attr("y1", y(0))
+    .attr("y2", y(0))
+    .attr("x2", width);
+
+    g.append("g")
     .attr("class", "axis axis--y")
     .call(d3.axisLeft(y))
     .append("text")
@@ -89,7 +97,40 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam){
     .attr("text-anchor", "end")
     .text("Points diff");
 
-
+    g.selectAll(".bar")
+      .data(data)
+      .enter().append("rect")
+      .attr("class", function(d){
+        var c = "";
+        if(d.pointsDiff < 0){
+          c+="bar negative";
+        }
+        else{
+          c+="bar positive";
+        }
+        if(d.wasHome){
+          c+=" bar-home";
+        }
+        else{
+          c+=" bar-away";
+        }
+        return c;
+      })
+      .attr("y", function(d){
+        if(d.pointsDiff > 0){
+          return y(d.pointsDiff);
+        }
+        else{
+          return y(0);
+        }
+      })
+      .attr("x", function(d, i){
+        return x(i);
+      })
+      .attr("width", x.bandwidth())
+      .attr("height", function(d){
+        return Math.abs(y(d.pointsDiff) - y(0));
+      })
 
   })
 }
