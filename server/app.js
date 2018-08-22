@@ -24,18 +24,21 @@ app.get('/api/get/teamResults', (req, res) => {
 	res.send(!req.query.team ? 'ERR' : dataLoader.getTeamResults(req.query.team))
 })
 
+app.get('/api/get/getVenues', (req, res) => {
+	res.send(!req.query.team || !req.query.startYear || !req.query.endYear ? 'ERR' : dataLoader.getVenues(req.query.team, req.query.startYear, req.query.endYear))
+})
+
 app.get('/api/get/rivalsInformation', (req, res) => {
-	if (!req.query.team) {
+	if (!req.query.team || !req.query.startYear || !req.query.endYear) {
 		res.send("ERR");
 	}
 	else {
-		res.send(dataLoader.getRivalsInformation(req.query.team));
-
+		res.send(dataLoader.getRivalsInformation(req.query.team, req.query.startYear, req.query.endYear));
 	}
 })
 
 app.get('/api/get/previousGamesVS', (req, res) => {
-	if (!req.query.team) {
+	if (!req.query.team || !req.query.vsTeam || !req.query.startYear || !req.query.endYear) {
 		res.send("ERR");
 	}
 	else if (!req.query.vsTeam) {
@@ -53,10 +56,6 @@ app.listen(config.port, (err) => {
 	}
 	console.log(`server is listening on ${config.port}`)
 })
-
-dataLoader.getTeamResults()
-//console.log(dataLoader.getTeamResults())
-
 
 // app.ge
 
