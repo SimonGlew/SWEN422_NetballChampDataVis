@@ -3,9 +3,13 @@
 <html>
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+
   <link rel="stylesheet" href="styles.css" />
 
   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
   <script src="./js/d3-interpolate-path.js"></script>
@@ -32,63 +36,83 @@
 
     <div class="main container-fluid">
       <div class="row">
-        <button class="btn btn-yoshi dropdown-toggle" type="button" data-toggle="dropdown">Team Select
-          <span class="caret"></span></button>
-          <div class="dropdown-menu systems-dropdown">
-            <a class="dropdown-item" href="#">Chiefs</a>
-            <a class="dropdown-item" href="#">Hurricanes</a>
-            <a class="dropdown-item" href="#">Crusaders</a>
-            <a class="dropdown-item" href="#">Blues</a>
-            <a class="dropdown-item" href="#">Highlanders</a>
-
-          </div>
-        </div>
-        <div id="team-performance-container" class="row">
-          <svg class="team-performance-chart"/>
-        </div>
-        <div id="venue-comparison-container" class="row">
-
-
-        </div>
-        <div id="rival-comparison-container" class="row">
-          <div class="rival-title row col-sm-12">
-            <h3 class="col-sm-12">Opposition Comparisons</h3>
-          </div>
-          <div class="row col-sm-12">
-            <div class="rival-check form-check col-sm-12">
-              <input class="form-check-input" type="checkbox" value="" id="rival-check">
-              <label class="form-check-label" for="rival-check">
-                Show Rivals Only
-              </label>
+        <div class="col-sm-2">
+          <button class="btn btn-yoshi dropdown-toggle" type="button" data-toggle="dropdown">Team Select
+            <span class="caret"></span></button>
+            <div class="dropdown-menu systems-dropdown">
+              <a class="dropdown-item" href="#">Central Pulse</a>
+              <a class="dropdown-item" href="#">Melbourne Vixens</a>
+              <a class="dropdown-item" href="#">Queensland Firebirds</a>
+              <a class="dropdown-item" href="#">West Coast Fever</a>
+              <a class="dropdown-item" href="#">Northern Mystics</a>
+              <a class="dropdown-item" href="#">Canterbury Tactix</a>
+              <a class="dropdown-item" href="#">Waikato Bay of Plenty Magic</a>
+              <a class="dropdown-item" href="#">Adelaide Thunderbirds</a>
+              <a class="dropdown-item" href="#">New South Wales Swifts</a>
+              <a class="dropdown-item" href="#">Southern Steel</a>
             </div>
           </div>
-          <div class="table-wrapper col-sm-5">
+          <div class="col-sm-4">
+            <div class="year-slider">
+              <div class="year-handle lower-handle ui-slider-handle"></div>
+              <div class="year-handle upper-handle ui-slider-handle"></div>
 
-            <table class="rivals-table table table-bordered table-hover">
-              <thead>
-                <tr>
-                  <th scope="col">Team</th>
-                  <th scope="col">Winrate VS</th>
-                  <th scope="col">Points Diff</th>
-                </tr>
-                <tbody class="rival-table-body">
-
-                </tbody>
-              </thead>
-            </table>
+            </div>
           </div>
-          <div class="rival-chart-wrapper col-sm-7">
-            <!-- <svg class="rival-comparison-chart"></svg> -->
+          <div class="col-sm-2">
+            <button class="btn btn-yoshi reload-button" type="button">Reload</button>
 
           </div>
         </div>
 
+
+
+      <div id="team-performance-container" class="row">
+        <svg class="team-performance-chart"/>
+      </div>
+      <div id="venue-comparison-container" class="row">
+
+
+      </div>
+      <div id="rival-comparison-container" class="row">
+        <div class="rival-title row col-sm-12">
+          <h3 class="col-sm-12">Opposition Comparisons</h3>
+        </div>
+        <div class="row col-sm-12">
+          <div class="rival-check form-check col-sm-12">
+            <input class="form-check-input" type="checkbox" value="" id="rival-check">
+            <label class="form-check-label" for="rival-check">
+              Show Rivals Only
+            </label>
+          </div>
+        </div>
+        <div class="table-wrapper col-sm-5">
+
+          <table class="rivals-table table table-bordered table-hover">
+            <thead>
+              <tr>
+                <th scope="col">Team</th>
+                <th scope="col">Winrate VS</th>
+                <th scope="col">Points Diff</th>
+              </tr>
+              <tbody class="rival-table-body">
+
+              </tbody>
+            </thead>
+          </table>
+        </div>
+        <div class="rival-chart-wrapper col-sm-7">
+          <!-- <svg class="rival-comparison-chart"></svg> -->
+
+        </div>
       </div>
 
-      <script src="./teamPerformance.js"></script>
-      <script src="./rivalComparison.js"></script>
-      <script src="./venueComparison.js"></script>
-      <script src="./index.js"></script>
+    </div>
 
-    </body>
-    </html>
+    <script src="./teamPerformance.js"></script>
+    <script src="./rivalComparison.js"></script>
+    <script src="./venueComparison.js"></script>
+    <script src="./index.js"></script>
+
+  </body>
+  </html>
