@@ -1,27 +1,30 @@
 RivalComparison = {};
+RivalComparison.team = "";
 
-RivalComparison.loadRivalComparisonRow = function(){
+RivalComparison.loadRivalComparisonRow = function(team, startYear, endYear, finals){
   console.log("Loading Rival data...");
 
 
 
-  var team = "Melbourne Vixens";
-  var vsTeam = "Central Pulse";
-  RivalComparison.loadRivalsTable(team, 2008, 2013, "all");
-  RivalComparison.loadPreviousGamesChart(team, vsTeam, 2008, 2013, "all");
+  RivalComparison.team = team;
+  // var vsTeam = "Central Pulse";
+  RivalComparison.loadRivalsTable(RivalComparison.team, startYear, endYear, finals);
+  // RivalComparison.loadPreviousGamesChart(team, vsTeam, 2008, 2013, "all");
 }
 
 RivalComparison.loadRivalsTable = function(team, startYear, endYear, finals){
-  $.get('api/get/rivalsInformation?team='+team+ '&startYear='+startYear + '&endYear='+endYear + "&finals="+finals, function(res){
+  var url = '/api/get/rivalsInformation?team='+team+ '&startYear='+startYear + '&endYear='+endYear + "&finals="+finals;
+  $.get(url, function(res){
     console.log("Get rival teams info", res);
     if(res){
       var tBody = $('.rival-table-body');
+      tBody.empty();
       res.forEach((e) =>{
-        var tr = $('<tr></tr>');
+        var tr = $('<tr class="unselectable"></tr>');
         tr.addClass("clickable-row");
         tr.css("cursor", "pointer")
 
-        var name = $('<td></td>');
+        var name = $('<td class="td-name"></td>');
         name.text(e.name);
 
         var winrate = $('<td></td>');
@@ -38,9 +41,11 @@ RivalComparison.loadRivalsTable = function(team, startYear, endYear, finals){
       })
     }
 
-    tBody.on('click', '.clickable-row', function(e){
+    tBody.on('click', '.clickable-row', (e)=>{
       // $(".clickable-row").removeClass('bg-info');
-      $(this).addClass('clicked-row').siblings().removeClass('clicked-row');
+      $(e.target.parentNode).addClass('clicked-row').siblings().removeClass('clicked-row');
+      var teamName = $(e.target.parentNode).find('.td-name').text();
+      RivalComparison.loadPreviousGamesChart(team,teamName,startYear,endYear,finals);
     })
 
   })
@@ -49,11 +54,11 @@ RivalComparison.loadRivalsTable = function(team, startYear, endYear, finals){
 RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYear, finals){
   $.get('/api/get/previousGamesVS?team='+team+'&vsTeam='+vsTeam+'&startYear='+startYear + '&endYear='+endYear+"&finals="+finals, function(res){
     console.log("got prev games info",res);
-
+    $('.rival-chart-wrapper').empty();
     //TeamA Points Differential VS TeamB, startYear - endYear
     // var BWIDTH = 50;
 
-    var title = team +" Points Differential VS "+vsTeam + ", years "+startYear +" - "+endYear;
+    var title = team +" Points Differential VS "+vsTeam + ", years "+startYear +" - "+(endYear+1);
     var data = res;
     var margin = {
       top:50,

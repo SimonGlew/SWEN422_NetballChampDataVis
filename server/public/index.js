@@ -6,11 +6,16 @@ $(document).ready(function(){
 function init(){
   console.log("init");
   setYearSlider();
-  TeamPerformance.loadPerformanceRow();
-  RivalComparison.loadRivalComparisonRow();
-  VenueComparison.loadVenueComparisonRow();
+  setTeamSelect();
+  setReload();
+  reload();
 
 
+
+}
+
+function setTeamSelect(){
+  // $("#team").selectmenu();
 }
 
 function setYearSlider(){
@@ -40,4 +45,27 @@ function setYearSlider(){
     values:[2008,2009],
     animate:true
   });
+}
+
+function setReload(){
+  $('.reload-button').click(function(e){
+    reload();
+  })
+}
+
+function reload(){
+  var team = $('#team').val();
+  var sliderVals = $('.year-slider').slider("values");
+  var startYear = sliderVals[0];
+  var endYear = sliderVals[1] -1;
+  var format = $('#format').val();
+  console.log("loading charts with ...",team,startYear,endYear);
+
+  TeamPerformance.loadPerformanceRow();
+  RivalComparison.loadRivalComparisonRow(team,startYear,endYear,format);
+  VenueComparison.loadVenueComparisonRow();
+}
+
+function loadCharts(){
+
 }
