@@ -1,8 +1,8 @@
 const parse = require('papaparse'),
     fs = require('fs')
 
-const FILES = [{ file: './server/data_files/2008-Table1.csv', year: 2008 }, { file: './server/data_files/2009-Table1.csv', year: 2009 }, { file: './server/data_files/2010-Table1.csv', year: 2010 },
-{ file: './server/data_files/2011-Table1.csv', year: 2011 }, { file: './server/data_files/2012-Table1.csv', year: 2012 }, { file: './server/data_files/2013-Table1.csv', year: 2013 }];
+ const FILES = [{ file: './server/data_files/2008-Table1.csv', year: 2008 }, { file: './server/data_files/2009-Table1.csv', year: 2009 }, { file: './server/data_files/2010-Table1.csv', year: 2010 },
+ { file: './server/data_files/2011-Table1.csv', year: 2011 }, { file: './server/data_files/2012-Table1.csv', year: 2012 }, { file: './server/data_files/2013-Table1.csv', year: 2013 }];
 
 const REGEX_PATTERN_BYE_TEAMS = /\sand\s/gm
 
@@ -117,20 +117,49 @@ function getVenues(team) {
 
     Object.keys(results).forEach(year => {
         results[year].filter(r => r.hTeam == team).forEach(homeGame => {
+            if(!venues.home[homeGame.venue]){
+                venues.home[homeGame.venue] = { timesPlayed: 0, timesWin: 0 }
+            }
 
+            if(team == homeGame.winningTeam){
+                venues.home[homeGame.venue].timesWin += 1
+            }
+
+            venues.home[homeGame.venue].timesPlayed += 1
         })
         results[year].filter(r => r.aTeam == team).forEach(awayGame => {
-
+            if(!venues.home[awayGame.venue]){
+                venues.away[awayGame.venue] = { timesPlayed: 0, timesWin: 0 }
+            }
+            if(team == awayGame.winningTeam){
+                venues.away[awayGame.venue].timesWin += 1
+            } 
+            venues.away[awayGame.venue].timesPlayed += 1
         })
     })
+
+    let obj = { home: [], away: [] }
+
+    Object.keys(venues.home).forEach(key => {
+        let v = venues.home[key]
+        obj.home.push({ venue: key, played: v.timesPlayed, won: v.timesWon })
+    })
+    obj.home.sort((a,b) => b.played - a.played)
+
+    Object.keys(venues.away).forEach(key => {
+        let v = venues.away[key]
+        obj.away.push({ venue: key, played: v.timesPlayed, won: v.timesWon })
+    })
+    obj.away.sort((a,b) => b.played - a.played)
+
+
+    return obj
 }
 
 function getTeamResults(team) {
     if (!resultsTable) {
         _makeResultTable()
     }
-
-    team = 'Adelaide Thunderbirds'
 
     let teamPlacing = []
 
@@ -149,8 +178,6 @@ function getTeamResults(team) {
     })
     teamPlacing.sort((a, b) => a.year - b.year)
 
-    //console.log(JSON.stringify(teamPlacing, null, 2))
-
     return teamPlacing
 }
 
@@ -158,47 +185,65 @@ function _makeResultTable() {
     resultsTable = { 2008: {}, 2009: {}, 2010: {}, 2011: {}, 2012: {}, 2013: {} }
 
     Object.keys(results).forEach(year => {
+        if (!resultsTable[year])
+            resultsTable[year] = []
         results[year].forEach((game, index) => {
             if (index + 4 < results[year].length) {
                 let round = parseInt(game.round)
-                if (!resultsTable[year][String(round)] || !resultsTable[year][String(round)].length)
+                if (!resultsTable[year][String(round)])
                     resultsTable[year][String(round)] = []
                 if (round > 1) {
                     if (!game.bye) {
-                        if((game.hTeam == 'Adelaide Thunderbirds' || game.aTeam == 'Adelaide Thunderbirds') && year == '2011'){
-                            console.log(game)
+                        let indexHome = (resultsTable[year][round - 1]).map(r => r.team).indexOf(game.hTeam)
+                        let indexAway = (resultsTable[year][round - 1]).map(r => r.team).indexOf(game.aTeam)
+
+                        if(indexHome == -1) {
+                            if(round > 2){
+                                let i = resultsTable[year][round - 2].map(r => r.team).indexOf(game.hTeam)
+                                resultsTable[year][round - 1].push(resultsTable[year][round - 2][i])
+                            }else{
+                                resultsTable[year][round - 1].push({ team: game.hTeam, points: 0, PD: 0 })
+                            }
+                            indexHome = (resultsTable[year][round - 1]).map(r => r.team).indexOf(game.hTeam)
+                        } 
+                        if(indexAway == -1) {
+                            if(round > 2){
+                                let i = resultsTable[year][round - 2].map(r => r.team).indexOf(game.aTeam)
+                                resultsTable[year][round - 1].push(resultsTable[year][round - 2][i])
+                            }else{
+                                resultsTable[year][round - 1].push({ team: game.aTeam, points: 0, PD: 0 })
+                            }
+                            indexAway = (resultsTable[year][round - 1]).map(r => r.team).indexOf(game.aTeam)
                         }
-                        let indexHome = (resultsTable[year][String(round - 1)]).map(r => r.team).indexOf(game.hTeam)
-                        let indexAway = (resultsTable[year][String(round - 1)]).map(r => r.team).indexOf(game.aTeam)
+                        let prevHomeTeam = resultsTable[year][round - 1][indexHome]
+                        let prevAwayTeam = resultsTable[year][round - 1][indexAway]
 
-                        let prevHomeTeam = resultsTable[year][String(round - 1)][indexHome]
-                        let prevAwayTeam = resultsTable[year][String(round - 1)][indexAway]
+                        let homeTeamPoints = prevHomeTeam.points + (game.winningTeam == game.hTeam ? 2 : 0)
+                        let awayTeamPoints = prevAwayTeam.points + (game.winningTeam == game.aTeam ? 2 : 0)
 
-                        let homeTeamPoints = (prevHomeTeam ? prevHomeTeam.points : 0) + (game.homeScore > game.awayScore ? 2 : 0)
-                        let awayTeamPoints = (prevAwayTeam ? prevAwayTeam.points : 0) + (game.homeScore > game.awayScore ? 0 : 2)
-
-                        let homePD = (prevHomeTeam ? prevHomeTeam.PD : 0) + (game.homeScore - game.awayScore)
-                        let awayPD = (prevAwayTeam ? prevAwayTeam.PD : 0) + (game.awayScore - game.homeScore)
+                        let homePD = prevHomeTeam.PD + (game.homeScore - game.awayScore)
+                        let awayPD = prevAwayTeam.PD + (game.awayScore - game.homeScore)
 
                         resultsTable[year][game.round].push({ team: game.hTeam, points: homeTeamPoints, PD: homePD })
                         resultsTable[year][game.round].push({ team: game.aTeam, points: awayTeamPoints, PD: awayPD })
                     } else {
-                        let index = resultsTable[year][String(round - 1)].map(r => r.team).indexOf(game.team)
-                        resultsTable[year][round].push(resultsTable[year][String(round - 1)][index])
+                        let i = resultsTable[year][round - 1].map(r => r.team).indexOf(game.team)
+                        resultsTable[year][game.round].push(resultsTable[year][round - 1][i])
                     }
                 } else {
                     //first round
-                    let homeTeamPoints = (game.homeScore > game.awayScore ? 2 : 0)
-                    let awayTeamPoints = (game.homeScore > game.awayScore ? 0 : 2)
+                    let homeTeamPoints = (game.winningTeam == game.hTeam ? 2 : 0)
+                    let awayTeamPoints = (game.winningTeam == game.aTeam ? 2 : 0)
 
                     let homePD = (game.homeScore - game.awayScore)
                     let awayPD = (game.awayScore - game.homeScore)
 
-                    resultsTable[year][round].push({ team: game.hTeam, points: homeTeamPoints, PD: homePD })
-                    resultsTable[year][round].push({ team: game.aTeam, points: awayTeamPoints, PD: awayPD })
+                    resultsTable[year][game.round].push({ team: game.hTeam, points: homeTeamPoints, PD: homePD })
+                    resultsTable[year][game.round].push({ team: game.aTeam, points: awayTeamPoints, PD: awayPD })
                 }
             }
         })
+
         let finalRound = [], finalRoundRound = null
         Object.keys(resultsTable[year]).forEach(round => {
             resultsTable[year][round].sort((a, b) => {
@@ -254,8 +299,6 @@ function _makeResultTable() {
 
         finalRound.forEach((team, index) => {
             if (index > 3) {
-                //if(year == '2011')            console.log(team)
-
                 resultsTable[year][finalRoundRound + 1][index] = team
             }
         })
@@ -292,5 +335,6 @@ module.exports = {
     getResults: getResults,
     getRivalsInformation: getRivalsInformation,
     getPreviousGamesVS: getPreviousGamesVS,
-    getTeamResults: getTeamResults
+    getTeamResults: getTeamResults,
+    getVenues: getVenues
 }

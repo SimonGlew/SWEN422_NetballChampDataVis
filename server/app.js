@@ -24,6 +24,10 @@ app.get('/api/get/teamResults', (req, res) => {
 	res.send(!req.query.team ? 'ERR' : dataLoader.getTeamResults(req.query.team))
 })
 
+app.get('/api/get/getVenues', (req, res) => {
+	res.send(!req.query.team ? 'ERR' : dataLoader.getVenues(req.query.team))
+})
+
 app.get('/api/get/rivalsInformation', (req, res) => {
 	if (!req.query.team) {
 		res.send("ERR");
@@ -53,10 +57,6 @@ app.listen(config.port, (err) => {
 	}
 	console.log(`server is listening on ${config.port}`)
 })
-
-dataLoader.getTeamResults()
-//console.log(dataLoader.getTeamResults())
-
 
 // app.ge
 
