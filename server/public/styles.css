@@ -80,6 +80,19 @@ fieldset[disabled] .btn-yoshi.active {
   background-color: #d3f6ff;
 }
 
+.year-slider{
+  margin-top: 10px;
+}
+
+.year-handle{
+  width: 3em !important;
+  height: 1.6em !important;
+  top: 50% !important;
+  margin-top: -.8em;
+  text-align: center;
+  line-height: 1.6em;
+}
+
 thead{
   background-color: #d4d5d6;
 }

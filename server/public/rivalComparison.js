@@ -7,8 +7,8 @@ RivalComparison.loadRivalComparisonRow = function(){
 
   var team = "Melbourne Vixens";
   var vsTeam = "Central Pulse";
-  RivalComparison.loadRivalsTable(team, 2008, 2009);
-  RivalComparison.loadPreviousGamesChart(team, vsTeam, 2008, 2009);
+  RivalComparison.loadRivalsTable(team, 2008, 2013, "all");
+  RivalComparison.loadPreviousGamesChart(team, vsTeam, 2008, 2013, "all");
 }
 
 RivalComparison.loadRivalsTable = function(team, startYear, endYear, finals){
@@ -66,7 +66,7 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
 
     var y = d3.scaleLinear()
     .range([height, 0])
-    .domain([-100,100])
+    .domain([-50,50])
     // .domain(d3.extent(data, function(d){
     //   return d.pointsDiff;
     // }))
