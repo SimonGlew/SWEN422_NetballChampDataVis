@@ -102,56 +102,91 @@ function getAllTeams() {
 }
 
 //Please simon give me this bad boi, pass you a team, you give back this shit for all other teams <3
-function getRivalsInformation(team) {
-    return JSON.parse(' [ { "name":"Chiefs", "winrateVS":"30%", "totalPointsDiff":"-13", "isRival":true }, { "name":"Central Pulse", "winrateVS":"56%", "totalPointsDiff":"57", "isRival":true }, { "name":"Voluptous Vultures", "winrateVS":"5%", "totalPointsDiff":"-270", "isRival":true } ] ');
+function getRivalsInformation(team, startYear, endYear) {
+    team = 'Northern Mystics'
+    startYear = '2008'
+    endYear = '2012'
+    let otherTeams = {}
+
+    Object.keys(results).forEach(year => {
+        if(year >= startYear && year <= endYear){
+            results[year].filter(r => r.hTeam == team || r.aTeam == team).forEach(game => {
+                let otherTeam = game.hTeam == team ? game.aTeam : game.hTeam
+
+                if(!otherTeams[otherTeam]){
+                    otherTeams[otherTeam] = { timesPlayed: 0, timesWon: 0, pointsDiff: 0 }
+                }
+                otherTeams[otherTeam].timesPlayed += 1
+                otherTeams[otherTeam].timesWon += (game.winningTeam == team ? 1 : 0)
+                otherTeams[otherTeam].pointsDiff += (game.hTeam == team ? game.homeScore - game.awayScore : game.awayScore - game.homeScore)
+            })
+        }
+    })
+
+    let returnObj = []
+    Object.keys(otherTeams).forEach(key => {
+        let otherTeamObj = otherTeams[key]
+        let teamObj = {
+            name: key,
+            winrateVS: ((otherTeamObj.timesWon / otherTeamObj.timesPlayed) * 100).toFixed(2),
+            totalPointsDiff: otherTeamObj.pointsDiff
+        }
+        teamObj.isRival = teamObj.winrateVS >= 25 && teamObj.winrateVS <= 75
+
+        returnObj.push(teamObj)
+    })
+
+    return returnObj
 }
 
 //Please simon give me shit like below, sorted by date order is CRUCIAL, catch you tmoz night <3
 
-function getPreviousGamesVS(team, vsTeam) {
+function getPreviousGamesVS(team, vsTeam, startYear, endYear) {
     return JSON.parse(' [ {"round":"1","date":"Saturday 5 April","team":"Melbourne Vixens", "vsTeam":"Central Pulse", "wasHome":false, "pointsDiff":25,"venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"}, {"round":"1","date":"Saturday 5 April","team":"Melbourne Vixens", "vsTeam":"Central Pulse", "wasHome":false, "pointsDiff":-35,"venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"} ] ');
 }
 
-function getVenues(team) {
+function getVenues(team, startYear, endYear) {
     let venues = { home: {}, away: {} }
 
     Object.keys(results).forEach(year => {
-        results[year].filter(r => r.hTeam == team).forEach(homeGame => {
-            if(!venues.home[homeGame.venue]){
-                venues.home[homeGame.venue] = { timesPlayed: 0, timesWin: 0 }
-            }
-
-            if(team == homeGame.winningTeam){
-                venues.home[homeGame.venue].timesWin += 1
-            }
-
-            venues.home[homeGame.venue].timesPlayed += 1
-        })
-        results[year].filter(r => r.aTeam == team).forEach(awayGame => {
-            if(!venues.home[awayGame.venue]){
-                venues.away[awayGame.venue] = { timesPlayed: 0, timesWin: 0 }
-            }
-            if(team == awayGame.winningTeam){
-                venues.away[awayGame.venue].timesWin += 1
-            } 
-            venues.away[awayGame.venue].timesPlayed += 1
-        })
+        if(year >= startYear && year <= endYear){
+            results[year].filter(r => r.hTeam == team).forEach(homeGame => {
+                if(!venues.home[homeGame.venue]){
+                    venues.home[homeGame.venue] = { timesPlayed: 0, timesWin: 0 }
+                }
+    
+                if(team == homeGame.winningTeam){
+                    venues.home[homeGame.venue].timesWin += 1
+                }
+    
+                venues.home[homeGame.venue].timesPlayed += 1
+            })
+            results[year].filter(r => r.aTeam == team).forEach(awayGame => {
+                if(!venues.home[awayGame.venue]){
+                    venues.away[awayGame.venue] = { timesPlayed: 0, timesWin: 0 }
+                }
+                if(team == awayGame.winningTeam){
+                    venues.away[awayGame.venue].timesWin += 1
+                } 
+                venues.away[awayGame.venue].timesPlayed += 1
+            })
+        }
     })
-
+        
     let obj = { home: [], away: [] }
 
     Object.keys(venues.home).forEach(key => {
         let v = venues.home[key]
-        obj.home.push({ venue: key, played: v.timesPlayed, won: v.timesWon })
+        console.log(v.timesPlayed, v.timesWin, (v.timesWin / v.timesPlayed))
+        obj.home.push({ venue: key, played: v.timesPlayed, won: v.timesWin, win_rate: (v.timesWin / v.timesPlayed) * 100 })
     })
     obj.home.sort((a,b) => b.played - a.played)
 
     Object.keys(venues.away).forEach(key => {
         let v = venues.away[key]
-        obj.away.push({ venue: key, played: v.timesPlayed, won: v.timesWon })
+        obj.away.push({ venue: key, played: v.timesPlayed, won: v.timesWin, win_rate: (v.timesWin / v.timesPlayed) * 100 })
     })
     obj.away.sort((a,b) => b.played - a.played)
-
 
     return obj
 }
@@ -334,7 +369,9 @@ module.exports = {
     getAllTeams: getAllTeams,
     getResults: getResults,
     getRivalsInformation: getRivalsInformation,
-    getPreviousGamesVS: getPreviousGamesVS,
+    getPreviousGamesVS: getPreviousGamesVS,//dataLoader.getTeamResults()
+    //console.log(dataLoader.getTeamResults())
+    
     getTeamResults: getTeamResults,
     getVenues: getVenues
 }
