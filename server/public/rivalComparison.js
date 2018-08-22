@@ -7,6 +7,9 @@ RivalComparison.loadRivalComparisonRow = function(team, startYear, endYear, fina
 
 
   RivalComparison.team = team;
+  RivalComparison.startYear = startYear;
+  RivalComparison.endYear = endYear;
+  RivalComparison.finals = finals;
   // var vsTeam = "Central Pulse";
   RivalComparison.loadRivalsTable(RivalComparison.team, startYear, endYear, finals);
   // RivalComparison.loadPreviousGamesChart(team, vsTeam, 2008, 2013, "all");
@@ -45,11 +48,13 @@ RivalComparison.loadRivalsTable = function(team, startYear, endYear, finals){
       // $(".clickable-row").removeClass('bg-info');
       $(e.target.parentNode).addClass('clicked-row').siblings().removeClass('clicked-row');
       var teamName = $(e.target.parentNode).find('.td-name').text();
-      RivalComparison.loadPreviousGamesChart(team,teamName,startYear,endYear,finals);
+      RivalComparison.loadPreviousGamesChart(RivalComparison.team,teamName,RivalComparison.startYear,RivalComparison.endYear,RivalComparison.finals);
     })
 
   })
 }
+
+
 // /{"round":"1","date":"Saturday 5 April","hTeam":"Central Pulse","score":"33–50","homeScore":33,"awayScore":50,"aTeam":"Melbourne Vixens","venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"}
 RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYear, finals){
   $.get('/api/get/previousGamesVS?team='+team+'&vsTeam='+vsTeam+'&startYear='+startYear + '&endYear='+endYear+"&finals="+finals, function(res){
@@ -87,6 +92,7 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
     //   .range([0,data.length])
 
     var svg = d3.select('.rival-chart-wrapper').append("svg")
+    .attr("class", "previous-games-chart")
     .attr("width", width+margin.left + margin.right)
     .attr("height", height+margin.bottom+margin.top);
 
@@ -102,8 +108,8 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
     g.append("g")
     .attr("class", "x axis")
     .append("line")
-    .attr("y1", y(0))
-    .attr("y2", y(0))
+    .attr("y1", height - y(0))
+    .attr("y2", height - y(0))
     .attr("x2", width);
 
     g.append("g")
@@ -137,7 +143,7 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
       })
       .attr("y", function(d){
         if(d.pointsDiff > 0){
-          return y(d.pointsDiff);
+          return y(0);
         }
         else{
           return y(0);
@@ -147,9 +153,20 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
         return x(i);
       })
       .attr("width", x.bandwidth())
+      .transition()
+      .attr("y", function(d){
+        if(d.pointsDiff > 0){
+          return y(d.pointsDiff);
+        }
+        else{
+          return y(0);
+        }
+      })
       .attr("height", function(d){
-        return Math.abs(y(d.pointsDiff) - y(0));
-      });
+        var h = Math.abs(y(d.pointsDiff) - y(0));
+        return h;
+      })
+
 
       svg.append("text")
         .attr("x", (width/2))
