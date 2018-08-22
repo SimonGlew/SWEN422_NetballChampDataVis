@@ -25,27 +25,24 @@ app.get('/api/get/teamResults', (req, res) => {
 })
 
 app.get('/api/get/getVenues', (req, res) => {
-	res.send(!req.query.team || !req.query.startYear || !req.query.endYear ? 'ERR' : dataLoader.getVenues(req.query.team, req.query.startYear, req.query.endYear))
+	res.send(!req.query.team || !req.query.startYear || !req.query.endYear || !req.query.finals ? 'ERR' : dataLoader.getVenues(req.query.team, req.query.startYear, req.query.endYear, req.query.finals))
 })
 
 app.get('/api/get/rivalsInformation', (req, res) => {
-	if (!req.query.team || !req.query.startYear || !req.query.endYear) {
+	if (!req.query.team || !req.query.startYear || !req.query.endYear || !req.query.finals) {
 		res.send("ERR");
 	}
 	else {
-		res.send(dataLoader.getRivalsInformation(req.query.team, req.query.startYear, req.query.endYear));
+		res.send(dataLoader.getRivalsInformation(req.query.team, req.query.startYear, req.query.endYear, req.query.finals));
 	}
 })
 
 app.get('/api/get/previousGamesVS', (req, res) => {
-	if (!req.query.team || !req.query.vsTeam || !req.query.startYear || !req.query.endYear) {
-		res.send("ERR");
-	}
-	else if (!req.query.vsTeam) {
+	if (!req.query.team || !req.query.vsTeam || !req.query.startYear || !req.query.endYear || !req.query.finals) {
 		res.send("ERR");
 	}
 	else {
-		res.send(dataLoader.getPreviousGamesVS(req.query.team, req.query.vsTeam))
+		res.send(dataLoader.getPreviousGamesVS(req.query.team, req.query.vsTeam, req.query.startYear, req.query.endYear, req.query.finals))
 	}
 
 })
