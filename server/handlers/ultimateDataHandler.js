@@ -136,13 +136,15 @@ function getRivalsInformation(team, startYear, endYear, finals) {
 		let otherTeamObj = otherTeams[key]
 		let teamObj = {
 			name: key,
-			winrateVS: ((otherTeamObj.timesWon / otherTeamObj.timesPlayed) * 100).toFixed(2),
+			winrateVS: (((otherTeamObj.timesWon / otherTeamObj.timesPlayed) * 100).toFixed(0)) + '%',
 			totalPointsDiff: otherTeamObj.pointsDiff
 		}
 		teamObj.isRival = teamObj.winrateVS >= 25 && teamObj.winrateVS <= 75
 
 		returnObj.push(teamObj)
 	})
+
+	returnObj.sort((a, b) => a.name - b.name)
 
 	return returnObj
 }
@@ -268,8 +270,8 @@ function _makeResultTable() {
 					resultsTable[year][String(round)] = []
 				if (round > 1) {
 					if (!game.bye) {
-						let indexHome = (resultsTable[year][round - 1]).map(r => r.team).indexOf(game.hTeam)
-						let indexAway = (resultsTable[year][round - 1]).map(r => r.team).indexOf(game.aTeam)
+						let indexHome = (resultsTable[year][round]).map(r => r.team).indexOf(game.hTeam)
+						let indexAway = (resultsTable[year][round]).map(r => r.team).indexOf(game.aTeam)
 
 						if (indexHome == -1) {
 							if (round > 2) {
@@ -298,8 +300,20 @@ function _makeResultTable() {
 						let homePD = prevHomeTeam.PD + (game.homeScore - game.awayScore)
 						let awayPD = prevAwayTeam.PD + (game.awayScore - game.homeScore)
 
-						resultsTable[year][game.round].push({ team: game.hTeam, points: homeTeamPoints, PD: homePD })
-						resultsTable[year][game.round].push({ team: game.aTeam, points: awayTeamPoints, PD: awayPD })
+						let hI = resultsTable[year][round].map(r => r.team).indexOf(game.hTeam),
+							aI = resultsTable[year][round].map(r => r.team).indexOf(game.aTeam)
+
+						if(hI != -1){
+							resultsTable[year][game.round][hI] = { team: game.hTeam, points: homeTeamPoints, PD: homePD }
+						}else{
+							resultsTable[year][game.round].push({ team: game.hTeam, points: homeTeamPoints, PD: homePD })
+						}
+
+						if(aI != -1){
+							resultsTable[year][game.round][aI] = { team: game.aTeam, points: awayTeamPoints, PD: awayPD }
+						}else{
+							resultsTable[year][game.round].push({ team: game.aTeam, points: awayTeamPoints, PD: awayPD })
+						}
 					} else {
 						let i = resultsTable[year][round - 1].map(r => r.team).indexOf(game.team)
 						resultsTable[year][game.round].push(resultsTable[year][round - 1][i])
@@ -396,6 +410,7 @@ function _makeResultTable() {
 				resultsTable[year][finalRoundRound + 3][index] = team
 			}
 		})
+
 	})
 
 }
