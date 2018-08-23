@@ -22,7 +22,7 @@ function loadData() {
 
 /**
  * Callback for CSV parsing, pushes data in results map
- * 
+ *
  * @param {Map} data - objects parsed from CSV
  * @param {Number} year - year of CSV
  */
@@ -88,10 +88,10 @@ function _csvFileParsed(data, year) {
 
 /**
  * Parse the CSV file passed in
- * 
+ *
  * @param {File} file - File object for parsing
  * @param {Function} callback - function to give data back to
- * @param {Number} fileYear - year of CSV file 
+ * @param {Number} fileYear - year of CSV file
  */
 function _parseCSVFile(file, callback, fileYear) {
 	parse.parse(file, {
@@ -123,9 +123,9 @@ function _parseCSVFile(file, callback, fileYear) {
 
 /**
  * Get all results for that year
- * 
+ *
  * @param {Number} year - year to get results from
- * 
+ *
  * @returns {Round[]} results - All results for that round
  */
 function getResults(year) {
@@ -135,7 +135,7 @@ function getResults(year) {
 
 /**
  * Returns an array of all teams
- * 
+ *
  * @returns {String[]} teams - array of all teams within the competition
  */
 function getAllTeams() {
@@ -144,12 +144,12 @@ function getAllTeams() {
 
 /**
  * Get winRate and totalPointDiff for each other team in the competition
- * 
+ *
  * @param {String} team - team to filter out
- * @param {String} startYear - year to start looking at 
+ * @param {String} startYear - year to start looking at
  * @param {String} endYear - year to finish looking at
  * @param {String} finals - rounds to filter by (all, regular, finals)
- * 
+ *
  * @param {[name: String, winrateVS: String, totalPointsDiff: Number, isRival: boolean, gamesPlayed: Number, gamesWon: Number]} rivalInfo - information about all other teams in competition
  */
 function getRivalsInformation(team, startYear, endYear, finals) {
@@ -189,7 +189,7 @@ function getRivalsInformation(team, startYear, endYear, finals) {
 			winrateVS: (((otherTeamObj.timesWon / otherTeamObj.timesPlayed) * 100).toFixed(0)) + '%',
 			totalPointsDiff: otherTeamObj.pointsDiff
 		}
-		teamObj.isRival = teamObj.winrateVS >= 25 && teamObj.winrateVS <= 75
+		teamObj.isRival = (otherTeamObj.timesWon / otherTeamObj.timesPlayed) >= 0.25 && (otherTeamObj.timesWon / otherTeamObj.timesPlayed) <= 0.75
 
 		returnObj.push(teamObj)
 	})
@@ -202,13 +202,13 @@ function getRivalsInformation(team, startYear, endYear, finals) {
 
 /**
  * Get all games played between two teams that fit between the filters
- * 
- * @param {String} team - 1st team selected 
+ *
+ * @param {String} team - 1st team selected
  * @param {String} vsTeam - 2nd team selected
- * @param {String} startYear - year to start looking at 
+ * @param {String} startYear - year to start looking at
  * @param {String} endYear - year to finish looking at
  * @param {String} finals - rounds to filter by (all, regular, finals)
- * 
+ *
  * @returns {Game[]} games - array of games played between the two teams sorted by oldest to newest
  */
 function getPreviousGamesVS(team, vsTeam, startYear, endYear, finals) {
@@ -245,12 +245,12 @@ function getPreviousGamesVS(team, vsTeam, startYear, endYear, finals) {
 
 /**
  * Get all venues the team played at, both home and away
- * 
+ *
  * @param {String} team - team to look for
- * @param {String} startYear - year to start looking at 
+ * @param {String} startYear - year to start looking at
  * @param {String} endYear - year to finish looking at
  * @param {String} finals - rounds to filter by (all, regular, finals)
- * 
+ *
  * @param {Venue[]} venues - venues team played at sorted by amount of games played at venue
  */
 function getVenues(team, startYear, endYear, finals) {
@@ -301,16 +301,16 @@ function getVenues(team, startYear, endYear, finals) {
 
 	//Format home venues from a map into the array and sort it by games played at venue
 	Object.keys(venues.home).forEach(key => {
-		let v = venues.home[key] + ' (home)'
-		obj.push({ venue: key, played: v.timesPlayed, won: v.timesWin, win_rate: (v.timesWin / v.timesPlayed) * 100 })
+        let v = venues.home[key] 
+		obj.push({ venue: key + ' (home)', toolTipVenue: key, played: v.timesPlayed, won: v.timesWin, win_rate: (v.timesWin / v.timesPlayed) * 100, home: true })
 	})
 
 	//Format away venues from a map to an array and sort it by games played at venue
 	Object.keys(venues.away).forEach(key => {
-		let v = venues.away[key] + ' (away)'
-		obj.push({ venue: key, played: v.timesPlayed, won: v.timesWin, win_rate: (v.timesWin / v.timesPlayed) * 100 })
-	})
-
+		let v = venues.away[key] 
+		obj.push({ venue: key + ' (away)', toolTipVenue: key, played: v.timesPlayed, won: v.timesWin, win_rate: (v.timesWin / v.timesPlayed) * 100, home: false })
+    })
+    
 	obj.sort((a, b) => b.played - a.played)
 
 	return obj
@@ -318,9 +318,9 @@ function getVenues(team, startYear, endYear, finals) {
 
 /**
  * Gets placings for each round for each year for a specific team, builds all results tables for each round,year if not cached
- * 
- * @param {String} team - team to find results for 
- * 
+ *
+ * @param {String} team - team to find results for
+ *
  * @returns {Year[]} results - array of year objects that hold an array of rounds, finalPlacement and year
  */
 function getTeamResults(team) {
@@ -334,7 +334,7 @@ function getTeamResults(team) {
 	//Go through each year
 	Object.keys(resultsTable).forEach(year => {
 		let yearObj = { placement: 0, rounds: [], year: parseInt(year) }
-		//Go through each round in the year and find the current placing for this round 
+		//Go through each round in the year and find the current placing for this round
 		Object.keys(resultsTable[year]).forEach((roundNumber, index) => {
 			let roundPlacement = resultsTable[year][roundNumber].map(r => r.team).indexOf(team)
 
@@ -362,7 +362,7 @@ function _makeResultTable() {
 
 	//For each year that was read in
 	Object.keys(results).forEach(year => {
-		//initalise year in results 
+		//initalise year in results
 		if (!resultsTable[year])
 			resultsTable[year] = []
 		//for each game within that year
@@ -470,7 +470,7 @@ function _makeResultTable() {
 			}
 		})
 
-		//Get final round and roundNumber of regular season for that year and sort rounds by points and then points difference 
+		//Get final round and roundNumber of regular season for that year and sort rounds by points and then points difference
 		let finalRound = [], finalRoundRound = null
 		Object.keys(resultsTable[year]).forEach(round => {
 			resultsTable[year][round].sort((a, b) => {
@@ -484,9 +484,9 @@ function _makeResultTable() {
 
 		/**
 		 * LAST 3 WEEKS - FINALS
-		 * 
+		 *
 		 * This code is hardcoding finals, we always expect last 4 games to look like the following:
-		 * 
+		 *
 		 * Game 1/2 - Major/Minor Semifinal
 		 * Game 3 - Winner of Minor/Loser of Major
 		 * Game 4 - Final
@@ -510,7 +510,7 @@ function _makeResultTable() {
 
 		//update round index
 		r = finalRoundRound + 1
-		
+
 		//This looks at winners, looking at the away team of the 2nd/3rd final, away team of this game (index - 2) must be the team that won the minor semi final
 		if (results[year][index - 2].aTeam == winnerOne) {
 			resultsTable[year][r][2] = { team: winnerOne } //Currently 3rd place, won minor semi final

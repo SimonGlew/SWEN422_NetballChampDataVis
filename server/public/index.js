@@ -14,6 +14,26 @@ function init(){
 
 }
 
+function showTooltip(left, top, html) {
+  $('#tooltip').css('left', left)
+  $('#tooltip').html(html)
+
+  let height = $('#tooltip').height()
+  $('#tooltip').css('top', (top + height))
+
+  d3.select('#tooltip')
+    .transition()
+    .duration(200)
+    .style("opacity", 1);
+}
+
+function hideTooltip() {
+  d3.select('#tooltip')
+    .transition()
+    .duration(200)
+    .style("opacity", 0);
+}
+
 function setTeamSelect(){
   // $("#team").selectmenu();
 }
@@ -45,7 +65,7 @@ function setYearSlider(){
     },
     range:true,
     min:2008,
-    max:2014,
+    max:2013,
     step:1,
     values:[2008,2009],
     animate:true
@@ -62,11 +82,14 @@ function reload(){
   var team = $('#team').val();
   var sliderVals = $('.year-slider').slider("values");
   var startYear = sliderVals[0];
-  var endYear = sliderVals[1] -1;
+  var endYear = sliderVals[1];
   var format = $('#format').val();
-  console.log("loading charts with ...",team,startYear,endYear);
+
+  console.log("setting title");
+  $('#team-title').text(team + ', years ' + startYear + " to "+sliderVals[1]);
+  console.log("loading charts with ...",team,startYear,sliderVals[1]);
 
   RivalComparison.loadRivalComparisonRow(team,startYear,endYear,format);
-  VenueComparison.loadVenueComparisonRow();
+  VenueComparison.loadVenueComparisonRow(team,startYear,endYear,format);
   TeamPerformance.loadData(team,startYear,endYear,format);
 }

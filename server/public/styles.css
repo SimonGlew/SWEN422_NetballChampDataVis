@@ -1,6 +1,9 @@
 .navbar{
   background-color: #33d6ad;
 }
+.navbar-brand{
+  font-size: 24px;
+}
 
 
 .main{
@@ -120,4 +123,24 @@ thead{
 
 .white{
   color: #fff;
+}
+
+#tooltip{
+  position:absolute;
+  opacity:0;
+  z-index:1000;
+  max-width:150px;
+  min-width:100px;
+  min-height:100px;
+  background-color:lightgrey;
+  border-radius: 5px;
+  border:3px solid black;
+}
+
+#venue-comparison-container{
+  height: 700px;
+}
+
+span.block{
+  display:block;
 }
