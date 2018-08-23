@@ -65,7 +65,3 @@ function reload(){
   RivalComparison.loadRivalComparisonRow(team,startYear,endYear,format);
   VenueComparison.loadVenueComparisonRow();
 }
-
-function loadCharts(){
-
-}

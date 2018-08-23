@@ -11,6 +11,7 @@ RivalComparison.loadRivalComparisonRow = function(team, startYear, endYear, fina
   RivalComparison.endYear = endYear;
   RivalComparison.finals = finals;
   // var vsTeam = "Central Pulse";
+  $('.rival-chart-wrapper').empty();
   RivalComparison.loadRivalsTable(RivalComparison.team, startYear, endYear, finals);
   // RivalComparison.loadPreviousGamesChart(team, vsTeam, 2008, 2013, "all");
 }
@@ -68,8 +69,8 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
     var margin = {
       top:50,
       right:10,
-      bottom:20,
-      left:30
+      bottom:60,
+      left:60
     },
     width = $('.rival-chart-wrapper').width() - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
@@ -103,7 +104,7 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
     g.append("g")
     .attr("class", "axis axis--x")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x));
+    .call(d3.axisBottom(x).tickFormat(function(d){return d+1}));
 
     g.append("g")
     .attr("class", "x axis")
@@ -175,6 +176,20 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
         .style("font-size", "16px")
         .style("text-decoration", "underline")
         .text(title);
+
+        svg.append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 0)
+          .attr("x", - (height / 2))
+          .attr("dy", "1em")
+          .style("text-anchor", "middle")
+          .text("Points Differential");
+
+        svg.append("text")
+          .attr("id", "yLabel")
+          .attr("transform", "translate(" + ((width+margin.left)/2) + " ," + (height + margin.top + margin.bottom/1.5) + ")")
+          .style("text-anchor", "middle")
+          .text("Previous Game Number");
 
 
   })
