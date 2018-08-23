@@ -14,9 +14,12 @@ function init(){
 
 }
 
-function showTooltip(right, top, html) {
-  $('#tooltip').css({ display: 'block', right: right, top: top })
+function showTooltip(left, top, html) {
+  $('#tooltip').css({ display: 'block', left: left })
   $('#innerTooltip').html(html)
+
+  let height = $('#tooltip').height()
+  $('#tooltip').css('top', (top + height))
 
   d3.select('#tooltip')
     .transition()
@@ -85,5 +88,5 @@ function reload(){
 
   TeamPerformance.loadPerformanceRow();
   RivalComparison.loadRivalComparisonRow(team,startYear,endYear,format);
-  VenueComparison.loadVenueComparisonRow();
+  VenueComparison.loadVenueComparisonRow(team,startYear,endYear,format);
 }
