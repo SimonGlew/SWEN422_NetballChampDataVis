@@ -118,7 +118,7 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
     //   .range([0,data.length])
 
     var svg = d3.select('.rival-chart-wrapper').append("svg")
-    .attr("class", "previous-games-chart")
+    .attr("id", "previous-games-chart")
     .attr("width", width+margin.left + margin.right)
     .attr("height", height+margin.bottom+margin.top);
 
@@ -151,6 +151,8 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
     g.selectAll(".bar")
       .data(data)
       .enter().append("rect")
+      .style("stroke", 'none')
+      .style("stroke-width","5px")
       .attr("class", function(d){
         var c = "";
         if(d.pointsDiff < 0){
@@ -180,7 +182,20 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
       })
       .attr("width", x.bandwidth())
       .on("mouseover", function(d){
-        showTooltip(500,500,'<span>Jack</span>');
+        var x = d3.event.x;
+        var y = d3.event.y;
+        console.log("MOUSE OVER");
+        RivalComparison.generateTooltip(x,y,d.date,d.venue,d.round,d.wasHome?team:vsTeam);
+      })
+      // .on("mousemove", function(d){
+      //   var x = d3.event.x;
+      //   var y = d3.event.y;
+      //   RivalComparison.generateTooltip(x,y,d.date,d.venue,d.round,d.wasHome?team:vsTeam);
+      // })
+      .on("mouseout",function(d){
+        console.log("MOUSE OUT");
+
+        hideTooltip();
       })
       .transition()
       .attr("y", function(d){
@@ -202,6 +217,7 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
         .attr("y", (margin.top /2))
         .attr("text-anchor", "middle")
         .style("font-size", "16px")
+        .style("font-weight", "bold")
         .style("text-decoration", "underline")
         .text(title);
 
@@ -221,4 +237,13 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
 
 
   })
+}
+
+RivalComparison.generateTooltip = function(x,y, date, venue, round, homeTeam){
+  var div = $('<div></div>');
+  div.append($('<div class="rival-tooltip"><span><b>Date:</b> '+date+'</span></div>'))
+  div.append($('<div class="rival-tooltip"><span><b>Venue:</b> '+venue+'</span></div>'))
+  div.append($('<div class="rival-tooltip"><span><b>Round:</b> '+round+'</span></div>'))
+  div.append($('<div class="rival-tooltip"><span><b>Home Team:</b> '+homeTeam+'</span></div>'))
+  showTooltip(x,y,div.html());
 }

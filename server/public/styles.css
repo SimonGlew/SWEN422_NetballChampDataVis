@@ -113,6 +113,10 @@ fieldset[disabled] .btn-white.active {
    user-select: none;
 }
 
+.rival-tooltip{
+  padding: 2px 10px;
+}
+
 #team-title-container{
   text-align: center;
 }
@@ -126,10 +130,8 @@ thead{
 }
 
 #tooltip{
-  position:absolute;
-  opacity:0;
-  z-index:1000;
-  max-width:150px;
+  position:fixed;
+  /* max-width:150px; */
   min-width:100px;
   min-height:100px;
   background-color:lightgrey;
