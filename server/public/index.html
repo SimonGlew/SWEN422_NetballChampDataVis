@@ -24,65 +24,59 @@
       <div class="col-sm-2">
         <span class="navbar-brand">ANZ Championship DataVis</span>
       </div>
-      <div class="col-sm-3">
-
-
+      <div class="col-sm-2 form-group">
+        <label for="team">Select a team:</label>
+        <select name="team" id="team" class="form-control">
+          <option value="Central Pulse" selected>Central Pulse</option>
+          <option value="Melbourne Vixens">Melbourne Vixens</option>
+          <option value="Queensland Firebirds">Queensland Firebirds</option>
+          <option value="West Coast Fever">West Coast Fever</option>
+          <option value="Northern Mystics">Northern Mystics</option>
+          <option value="Canterbury Tactix">Canterbury Tactix</option>
+          <option value="Waikato Bay of Plenty Magic">Waikato Bay of Plenty Magic</option>
+          <option value="Adelaide Thunderbirds">Adelaide Thunderbirds</option>
+          <option value="New South Wales Swifts">New South Wales Swifts</option>
+          <option value="Southern Steel">Southern Steel</option>
+        </select>
 
       </div>
-      <div class="col-sm-4">
+      <div class="col-sm-4 form group slider-col">
+        <label>Select a Date Range:</label>
+        <div class="year-slider">
+          <div class="year-handle lower-handle ui-slider-handle"></div>
+          <div class="year-handle upper-handle ui-slider-handle"></div>
+
+        </div>
+      </div>
+      <div class="col-sm-2 form-group">
+        <label for="format">Select a Format:</label>
+        <select name="format" id="format" class="form-control">
+          <option value="regular" >Regular</option>
+          <option value="finals">Finals</option>
+          <option value="all" selected>All</option>
+        </select>
+
+      </div>
+      <div class="col-sm-1">
+        <button class="btn btn-white reload-button" type="button">Reload</button>
 
       </div>
     </nav>
 
     <div class="main container-fluid">
       <div class="row">
-        <div class="col-sm-2 form-group">
-          <label for="team">Select a team:</label>
-          <select name="team" id="team" class="form-control">
-            <option value="Central Pulse" selected>Central Pulse</option>
-            <option value="Melbourne Vixens">Melbourne Vixens</option>
-            <option value="Queensland Firebirds">Queensland Firebirds</option>
-            <option value="West Coast Fever">West Coast Fever</option>
-            <option value="Northern Mystics">Northern Mystics</option>
-            <option value="Canterbury Tactix">Canterbury Tactix</option>
-            <option value="Waikato Bay of Plenty Magic">Waikato Bay of Plenty Magic</option>
-            <option value="Adelaide Thunderbirds">Adelaide Thunderbirds</option>
-            <option value="New South Wales Swifts">New South Wales Swifts</option>
-            <option value="Southern Steel">Southern Steel</option>
-          </select>
 
-        </div>
-        <div class="col-sm-1">
 
-        </div>
-        <div class="col-sm-4 form group">
-          <label>Select a Date Range:</label>
-          <div class="year-slider">
-            <div class="year-handle lower-handle ui-slider-handle"></div>
-            <div class="year-handle upper-handle ui-slider-handle"></div>
 
-          </div>
-        </div>
         <div class="col-sm-1">
 
         </div>
 
-        <div class="col-sm-2 form-group">
-          <label for="format">Select a Format:</label>
-          <select name="format" id="format" class="form-control">
-            <option value="regular" >Regular</option>
-            <option value="finals">Finals</option>
-            <option value="all" selected>All</option>
-          </select>
 
-        </div>
         <div class="col-sm-1">
 
         </div>
-        <div class="col-sm-1">
-          <button class="btn btn-yoshi reload-button" type="button">Reload</button>
 
-        </div>
       </div>
       <hr/>
 
