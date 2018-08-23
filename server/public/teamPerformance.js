@@ -1,14 +1,109 @@
 TeamPerformance = {};
 
-TeamPerformance.loadPerformanceRow = function(){
+TeamPerformance.createGraph = function createGraph(){
+  setupSVG();
+  setupAxis();
+  setupLabels();
+}
+
+TeamPerformance.loadData = function(team, startYear, endYear, finals){
   console.log("Loading Performance data...");
-  team = "Waikato Bay of Plenty Magic"
-  $.get('/api/get/teamResults?team='+team, function(res){
-    createGraph(res);
+  var url = '/api/get/teamResults?team='+team;
+  $.get(url, function(res){
+    console.log(res)
+    createGraph(res, startYear, endYear, finals);
   })
 }
 
-function createGraph(data){
+let numTeams = 10;
+
+let width;
+let height;
+let margin = 50;
+
+function setupSVG(){
+    //References for container div and chart svg.
+    let container = d3.select("#team-performance-container");
+    let svg = d3.select(".team-performance-chart");
+    //Set width and height of chart svg
+    width = container.node().getBoundingClientRect().width;
+    height = 400;
+    svg.attr("width", width)
+      .attr("height", height);
+
+    //Setup groups for ordering svg elements on z axis.
+    let gMouseListener = svg.append("g").attr("id", "mouse-listeners");
+    let gMarkers = svg.append("g").attr("id", "markers");
+    let gXLabelAxis = svg.append("g");
+    svg.append("g").attr("id", "g-yAxis");
+    svg.append("g").attr("id", "g-xAxis");;
+}
+
+let xScale, xAxis;
+let yScale, yAxis;
+
+function setupAxis(){
+  var defaultScale = [2008, 2013];
+  xScale = d3.scaleLinear()
+    .domain(defaultScale)
+    .range([margin, width-margin])
+
+  xAxis = d3.axisBottom(xScale)
+    .tickFormat(d3.format(".0f"))
+    .ticks(0)
+
+  d3.select("#g-xAxis").attr("class", "xAxis")
+    .attr("transform", "translate(0, " + (height - margin) + ")")
+    .call(xAxis);
+
+  yScale = d3.scaleLinear()
+    .domain([1, numTeams])
+    .range([margin, height-margin]);
+
+  yAxis = d3.axisLeft(yScale)
+    .tickFormat(d3.format(".0f"))
+    .ticks(numTeams)
+
+  d3.select("#g-yAxis")
+    .attr("transform", "translate(" + margin + ", 0)")
+    .call(yAxis);
+}
+
+function setupLabels(){
+  d3.select(".team-performance-chart").append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0)
+    .attr("x", - (height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Placing");
+
+  d3.select(".team-performance-chart").append("text")
+    .attr("id", "yLabel")
+    .attr("transform", "translate(" + (width/2) + " ," + (height - margin/3) + ")")
+    .style("text-anchor", "middle")
+    .text("Year");
+
+   d3.select(".team-performance-chart").append("text")
+    .attr("transform", "translate(" + (width/2) + " ," + (margin/3) + ")")
+    .style("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .style("text-decoration", "underline")
+    .text("")
+}
+
+function createGraph(data, startYear, endYear){
+  console.log("Years: " + startYear + " - " + endYear);
+  updateAxis(startYear, endYear);
+}
+
+function updateAxis(startYear, endYear){
+  xScale.domain([startYear - 1, endYear]);
+  d3.select("#g-xAxis").attr("class", "xAxis")
+    .call(xAxis.ticks(endYear - startYear));
+}
+
+function createGraph2(data){
   var zoomedIn = false;
   //TODO load this from data
 
@@ -37,32 +132,11 @@ function createGraph(data){
 
   var currYear = 0;
 
-  //References for container div and chart svg.
-  let container = d3.select("#team-performance-container");
-  let svg = d3.select(".team-performance-chart");
-
-
-  //Set width and height of chart svg
-  let width = container.node().getBoundingClientRect().width;
-  let height = 400;
-
-  //Set svg width to container width and arbitrary height
-  svg.attr("width", width)
-    .attr("height", height);
-
   //Define groups for svg elements (Useful for defining z-order)
-  let gMouseListener = svg.append("g").attr("id", "mouse-listeners");
-  let gMarkers = svg.append("g").attr("id", "markers");
-  let gXAxis = svg.append("g");
-  let gXLabelAxis = svg.append("g");
-  let gYAxis = svg.append("g");
+
 
   //Set scales
-  let margin = 50;
 
-  let xScale = d3.scaleLinear()
-    .domain(d3.extent(years))
-    .range([margin, width-margin])
 
   let xZoomedScale = d3.scaleLinear()
     .domain(d3.extent(years))
@@ -108,22 +182,16 @@ function createGraph(data){
   }
   updateXRoundScale()
 
-  let yScale = d3.scaleLinear()
-    .domain([1, 10])
 
-    .range([margin, height-margin]);
 
   //Add axis
-  gXAxis.attr("class", "xAxis")
-    .attr("transform", "translate(0, " + (height - margin) + ")");
+
 
   gXLabelAxis.attr("class", "xLabelAxis")
     .attr("transform", "translate(0, " + (height - margin) + ")")
     .style("opacity", 0)
 
-  let xAxis = d3.axisBottom(xZoomedScale)
-    .tickFormat(d3.format(".0f"))
-    .ticks(years.length)
+
 
   let xLabelAxis = d3.axisBottom(xRoundLabelScale);
 
@@ -131,36 +199,11 @@ function createGraph(data){
   //   .tickFormat(d3.format(".0f"))
   //   .ticks(16)
 
-  gYAxis.attr("class", "yAxis")
-    .attr("transform", "translate(" + margin + ", 0)");
 
-  let yAxis = d3.axisLeft(yScale)
-    .tickFormat(d3.format(".0f"))
-    .ticks(numTeams)
 
-  gXAxis.call(xAxis);
-  gYAxis.call(yAxis);
 
-  svg.append("text")
-    .attr("transform", "rotate(-90)")
-    .attr("y", 0)
-    .attr("x", - (height / 2))
-    .attr("dy", "1em")
-    .style("text-anchor", "middle")
-    .text("Placing");
 
-  svg.append("text")
-    .attr("id", "yLabel")
-    .attr("transform", "translate(" + (width/2) + " ," + (height - margin/3) + ")")
-    .style("text-anchor", "middle")
-    .text("Year");
 
-   svg.append("text")
-    .attr("transform", "translate(" + (width/2) + " ," + (margin/3) + ")")
-    .style("text-anchor", "middle")
-    .style("font-weight", "bold")
-    .style("text-decoration", "underline")
-    .text("Final Placings of Central Pulse")
 
 
   //Add rectangles for zooming in mouse interaction
