@@ -6,12 +6,17 @@ TeamPerformance.createGraph = function createGraph(){
   setupLabels();
 }
 
+let showingData = false;
+
 TeamPerformance.loadData = function(team, startYear, endYear, finals){
   console.log("Loading Performance data...");
   var url = '/api/get/teamResults?team='+team;
   $.get(url, function(res){
-    console.log(res)
-    createGraph(res, startYear, endYear, finals);
+    if(!showingData){
+      createGraph(res, startYear, endYear, finals);
+    }else{
+      removeData();
+    }
   })
 }
 
@@ -22,21 +27,21 @@ let height;
 let margin = 50;
 
 function setupSVG(){
-    //References for container div and chart svg.
-    let container = d3.select("#team-performance-container");
-    let svg = d3.select(".team-performance-chart");
-    //Set width and height of chart svg
-    width = container.node().getBoundingClientRect().width;
-    height = 400;
-    svg.attr("width", width)
-      .attr("height", height);
+  //References for container div and chart svg.
+  let container = d3.select("#team-performance-container");
+  let svg = d3.select(".team-performance-chart");
+  //Set width and height of chart svg
+  width = container.node().getBoundingClientRect().width;
+  height = 400;
+  svg.attr("width", width)
+    .attr("height", height);
 
-    //Setup groups for ordering svg elements on z axis.
-    let gMouseListener = svg.append("g").attr("id", "mouse-listeners");
-    let gMarkers = svg.append("g").attr("id", "markers");
-    let gXLabelAxis = svg.append("g");
-    svg.append("g").attr("id", "g-yAxis");
-    svg.append("g").attr("id", "g-xAxis");;
+  //Setup groups for ordering svg elements on z axis.
+  svg.append("g").attr("id", "mouse-listeners");
+  svg.append("g").attr("id", "markers");
+  // let gXLabelAxis = svg.append("g");
+  svg.append("g").attr("id", "g-yAxis");
+  svg.append("g").attr("id", "g-xAxis");;
 }
 
 let xScale, xAxis;
@@ -79,7 +84,7 @@ function setupLabels(){
     .text("Placing");
 
   d3.select(".team-performance-chart").append("text")
-    .attr("id", "yLabel")
+    .attr("id", "xLabel")
     .attr("transform", "translate(" + (width/2) + " ," + (height - margin/3) + ")")
     .style("text-anchor", "middle")
     .text("Year");
@@ -92,15 +97,368 @@ function setupLabels(){
     .text("")
 }
 
+let buildDur = 250;
+
+let years;
+let yearData;
+let yearRounds;
+let roundData;
+
 function createGraph(data, startYear, endYear){
-  console.log("Years: " + startYear + " - " + endYear);
-  updateAxis(startYear, endYear);
+  processData(data, startYear, endYear);
+  xZoomedScale = d3.scaleLinear()
+    .domain(d3.extent(years))
+    .range([margin, width-margin])
+  updateXRoundScale()
+  updateAxis();
+  addMouseListeners(data);
+  plotData(data)
+  showingData = true;
 }
 
-function updateAxis(startYear, endYear){
-  xScale.domain([startYear - 1, endYear]);
+function processData(data, startYear, endYear){
+  years = [];
+  for(var i = startYear; i <= endYear; i++){
+    years.push(i);
+  }
+  yearRounds = [];
+  yearData = [];
+  roundData = [];
+  for(var i = 0; i < data.length; i++){
+    if(data[i].year >= startYear && data[i].year <= endYear){
+      yearRounds.push(data[i].rounds.length);
+      yearData.push({year: data[i].year, placement: data[i].placement})
+      for(var j = 0; j < data[i].rounds.length; j++){
+        roundData.push(data[i].rounds[j]);
+      }
+    }
+  }
+}
+
+function updateAxis(){
+  xScale.domain(d3.extent(years));
   d3.select("#g-xAxis").attr("class", "xAxis")
-    .call(xAxis.ticks(endYear - startYear));
+    .transition()
+    .duration(buildDur)
+    .call(xAxis.ticks(years.length))
+}
+
+function addMouseListeners(data){
+  //Add rectangles for zooming in mouse interaction
+  d3.select("#mouse-listeners").selectAll("rect")
+    .data(years)
+    .enter()
+    .append("rect")
+    .attr("class", "zoom-in")
+    .attr("x", function(d){
+      if(d == years[0]) return margin;
+      return xScale(d-0.5);
+    })
+    .attr("y", margin)
+    .attr("width", function(d){
+      if(d == years[0] || d == years[years.length-1]) return (width-2*margin)/(years.length-1)/2;
+      return (width-2*margin)/(years.length-1);
+    })
+    .attr("height", height-2*margin)
+    .attr("fill", "#FFF")
+    .style("cursor", "pointer")
+    .on("mouseover", function(){2008
+      d3.select(this).attr("fill", "#F5F5F5")
+    })
+    .on("mouseout", function(){
+      d3.select(this).attr("fill", "#FFF")
+    })
+    .on("click", zoomIn)
+
+    //Add rectangles for zooming out mouse interaction
+  d3.select("#mouse-listeners").append("rect")
+    .attr("class", "zoom-out")
+    .attr("x", margin)
+    .attr("y", margin)
+    .attr("width", width-2*margin)
+    .attr("height", height-2*margin)
+    .attr("fill", "#FFF")
+    .style("opacity", 0)
+    .style("pointer-events", "none")
+    .on("mouseover", function(){
+      d3.select(this).attr("fill", "#F5F5F5")
+    })
+    .on("mouseout", function(){
+      d3.select(this).attr("fill", "#FFF")
+    })
+    .on("click", zoomOut)
+    .style("cursor", "pointer")
+}
+
+let initialLine;
+let line;
+let roundLine;
+
+function plotData(data){
+  d3.select("#markers").append("clipPath")
+    .attr("id", "marker-clip")
+    .append("rect")
+      .attr("x", margin)
+      .attr("y", 0)
+      .attr("width", width-margin*2)
+      .attr("height", height-margin)
+
+  initialLine = d3.line()
+    .x(function(d, i) { return xScale(d.year);})
+    .y(function(d) { return yScale(10);})
+    .curve(d3.curveCatmullRom)
+
+  line = d3.line()
+    .x(function(d, i) { return xScale(d.year); })
+    .y(function(d) { return yScale(d.placement); })
+    .curve(d3.curveCatmullRom)
+
+  roundLine = d3.line()
+    .x(function(d, i) { return xRoundScale(i); })
+    .y(function(d) { return yScale(d.placement); })
+    .curve(d3.curveCatmullRom)
+
+  d3.select("#markers").append("g")
+    .attr("id", "line-g")
+
+  d3.select("#markers").append("g")
+    .attr("id", "year-markers")
+
+  d3.select("#markers").append("g")
+    .attr("id", "round-markers")
+
+  d3.select("#markers").select("#line-g").append("path")
+    .datum(yearData)
+    .attr("id", "line")
+    .attr("d", initialLine)
+    .attr("fill", "none")
+    .attr("stroke", "#70a7ff")
+    .attr("stroke-linejoin", "round")
+    .attr("stroke-linecap", "round")
+    .attr("stroke-width", 1.5)
+    .attr("clip-path", "url(#marker-clip)")
+    .transition()
+    .duration(buildDur)
+    .attr("d", line);
+
+  d3.select("#markers").select("#year-markers").selectAll("circle")
+    .data(yearData)
+    .enter()
+    .append("circle")
+      .attr("class", "marker")
+      .attr("r", 0)
+      .attr("cx", function(d, i){
+        return xScale(d.year);
+      })
+      .attr("cy", function(d){
+        return yScale(10);
+      })
+      .attr("fill", "#5697ff")
+      .attr("clip-path", "url(#marker-clip)")
+      .transition()
+      .duration(buildDur)
+      .attr("cy", function(d){
+        return yScale(d.placement);
+      })
+      .attr("r", 6);
+
+    d3.select("#markers").select("#round-markers").selectAll("circle")
+      .data(roundData)
+      .enter()
+      .append("circle")
+        .attr("class", "roundmarker")
+        .attr("r", 0)
+        .attr("cx", function(d, i){
+          return xRoundScale(i);
+        })
+        .attr("cy", function(d){
+          return yScale(d.placement);
+        })
+        .attr("fill", "#5697ff")
+        .attr("clip-path", "url(#marker-clip)")
+        .style("opacity", 0.8);
+}
+
+function removeData(){
+  removeAxis();
+  removeMouseListeners();
+  removePlot();
+  showingData = false;
+}
+
+function removeAxis(){
+  d3.select("#g-xAxis").attr("class", "xAxis")
+    .transition()
+    .duration(buildDur)
+    .call(xAxis.ticks(0))
+}
+
+function removeMouseListeners(){
+  d3.selectAll("#mouse-listeners")
+    .selectAll("rect")
+    .remove();
+}
+
+function removePlot(){
+  d3.selectAll(".marker")
+    .transition()
+    .duration(buildDur)
+    .attr("cy", yScale(10))
+    .attr("r", 0)
+    .on("end", function(){
+      d3.select(this).remove()
+    })
+
+  d3.selectAll(".roundmarker")
+    .transition()
+    .duration(buildDur)
+    .duration(buildDur)
+    .attr("cy", yScale(10))
+    .attr("r", 0)
+    .on("end", function(){
+      d3.select(this).remove()
+    })
+
+  d3.select("#line")
+    .transition()
+    .duration(buildDur)
+    .attr("d", initialLine)
+    .on("end", function(){
+      d3.select("#line").remove()
+    })
+}
+
+function zoomIn(year){
+  console.log("Zoom into " + year)
+
+  currYear = year;
+  var dur = 1000;
+
+  xZoomedScale.domain([year-1, year])
+  updateXRoundScale();
+  updateXRoundLabelScale();
+  xScale.domain(d3.extent(years))
+
+  d3.select("#xLabel")
+    .transition()
+    .duration(dur/2)
+    .style("opacity", 0)
+  //
+  // gXLabelAxis.transition()
+  //   .call(xLabelAxis);
+
+  d3.select("#g-xAxis").transition()
+    .duration(dur)
+    .call(xAxis.ticks(1))
+
+  d3.selectAll(".marker")
+    .transition()
+    .duration(dur)
+    .attr("cx", function(d){
+      return xZoomedScale(d.year);
+    })
+
+
+
+  d3.select("#line")
+    .transition()
+    .duration(dur)
+    .attrTween('d', function (d) {
+      return d3.interpolatePath(line(yearData), roundLine(roundData));
+    })
+    .on("end", function(){
+      d3.selectAll(".roundmarker")
+        .attr("cx", function(d, i){
+          return xRoundScale(i);
+        })
+        .transition()
+        .duration(dur/2)
+        .attr("r", 4)
+
+    //   gXLabelAxis.transition()
+    //     .duration(dur/2)
+    //     .style("opacity", 1);
+    //
+    //   gXAxis.transition()
+    //     .duration(dur/2)
+    //     .style("opacity", 0);
+    //
+      d3.select("#xLabel")
+        .text("Rounds (" +  year + ")")
+        .transition()
+        .duration(dur/2)
+        .style("opacity", 1)
+    //
+    //
+    });
+
+
+
+  d3.select(".zoom-out")
+    .style("pointer-events", "all")
+    .style("opacity", 1)
+  d3.select(this)
+    .style("pointer-events", "none")
+    .style("opacity", 0)
+}
+
+function zoomOut(){
+  var dur = 1000;
+
+  xZoomedScale.domain(d3.extent(years))
+  d3.selectAll(".roundmarker")
+    .attr("cx", function(d, i){
+      return xRoundScale(i);
+    })
+    .transition()
+    .duration(dur/2)
+    .attr("r", 0)
+
+  // gXAxis.transition()
+  //   .duration(dur)
+  //   .call(xAxis.ticks(years.length));
+  //
+  // gXLabelAxis.transition()
+  //   .duration(dur/2)
+  //   .style("opacity", 0);
+  //
+  // gXAxis.transition()
+  //   .duration(dur/2)
+  //   .style("opacity", 1);
+
+  d3.selectAll(".marker")
+    .transition()
+    .duration(dur)
+    .attr("cx", function(d, i){
+      return xScale(d.year);
+    })
+    .on("end", function(){
+      d3.select("#xLabel")
+        .text("Year")
+        .transition()
+        .duration(dur/2)
+        .style("opacity", 1)
+
+    })
+
+  d3.select("#xLabel")
+    .transition()
+    .duration(dur/2)
+    .style("opacity", 0)
+
+  d3.select("#line")
+    .transition()
+    .duration(dur)
+    .attrTween('d', function (d) {
+      return d3.interpolatePath(roundLine(roundData), line(yearData));
+    })
+
+  d3.selectAll(".zoom-in")
+    .style("pointer-events", "all")
+    .style("opacity", 1)
+  d3.select(this)
+    .style("pointer-events", "none")
+    .style("opacity", 0)
 }
 
 function createGraph2(data){
@@ -109,17 +467,7 @@ function createGraph2(data){
 
   console.log(data)
   years = [];
-  yearRounds = [];
-  yearData = [{year: 2007, placement: 5}];
-  roundData = [];
-  for(var i = 0; i < data.length; i++){
-    years.push(data[i].year);
-    yearRounds.push(data[i].rounds.length);
-    yearData.push({year: data[i].year, placement: data[i].placement})
-    for(var j = 0; j < data[i].rounds.length; j++){
-      roundData.push(data[i].rounds[j]);
-    }
-  }
+
 
   console.log("Year Data", yearData)
 
@@ -138,49 +486,8 @@ function createGraph2(data){
   //Set scales
 
 
-  let xZoomedScale = d3.scaleLinear()
-    .domain(d3.extent(years))
-    .range([margin, width-margin])
 
-  let xRoundScale;
 
-  let xRoundLabelScale = d3.scaleOrdinal();
-
-  function updateXRoundLabelScale(i){
-    year = years[i]
-    var labels = [year - 1];
-    var range = [margin];
-    console.log(yearRounds)
-    for(var j = 1; j < yearRounds[i]; j++){
-      labels.push(j);
-      range.push(margin + (width-2*margin)/yearRounds[i]*j)
-    }
-    labels.push(year);
-    range.push(width - margin);
-    console.log("labels", labels);
-    console.log("range", range);
-    xRoundLabelScale.domain(labels).range(range)
-    console.log(xRoundLabelScale);
-  }
-
-  function updateXRoundScale(){
-    var roundsRange = [];
-    var roundsDomain = [];
-    var roundCount = -1;
-    for(var i = 0; i <= years.length; i++){
-      var year = i < years.length ? years[i] - 1 : years[i-1];
-      roundsRange.push(xZoomedScale(year));
-      roundsDomain.push(roundCount);
-      roundCount += yearRounds[i];
-    }
-    console.log("ROUNDS DOMAIN:", roundsDomain)
-    console.log("ROUNDS RANGE:", roundsRange)
-
-    xRoundScale = d3.scaleLinear()
-      .domain(roundsDomain)
-      .range(roundsRange)
-  }
-  updateXRoundScale()
 
 
 
@@ -206,259 +513,50 @@ function createGraph2(data){
 
 
 
-  //Add rectangles for zooming in mouse interaction
-  gMouseListener.selectAll("rect")
-    .data(years)
-    .enter()
-    .append("rect")
-    .attr("class", "zoom-in")
-    .attr("x", function(d){
-      if(d == years[0]){
-        return margin;
-      }
-      return xScale(d-0.5);
-    })
-    .attr("y", margin)
-    .attr("width", function(d){
-      if(d == years[0] || d == years[years.length-1]){
-        return (width-2*margin)/(years.length-1)/2;
-      }
-      return (width-2*margin)/(years.length-1);
-    })
-    .attr("height", height-2*margin)
-    .attr("fill", "#FFF")
-    .style("cursor", "pointer")
-    .on("mouseover", function(){2008
-      d3.select(this).attr("fill", "#F5F5F5")
-    })
-    .on("mouseout", function(){
-      d3.select(this).attr("fill", "#FFF")
-    })
-    .on("click", function(d, i){
-      console.log("Zoom into " + d + " (index " + i + ")")
 
-      currYear = i;
-      var dur = 1000;
-
-      xZoomedScale.domain([d-1, d])
-      updateXRoundScale();
-      updateXRoundLabelScale(i);
-      xScale.domain(d3.extent(years))
-
-      d3.select("#yLabel")
-        .transition()
-        .duration(dur/2)
-        .style("opacity", 0)
-
-      gXLabelAxis.transition()
-        .call(xLabelAxis);
-
-      gXAxis.transition()
-        .duration(dur)
-        .call(xAxis.ticks(1))
-
-      d3.selectAll(".marker")
-        .transition()
-        .duration(dur)
-        .attr("cx", function(d){
-          return xZoomedScale(d.year);
-        })
-
-
-
-      d3.select("#line")
-        .transition()
-        .duration(dur)
-        .attrTween('d', function (d) {
-          return d3.interpolatePath(line(yearData), roundLine(roundData));
-        })
-        .on("end", function(){
-          d3.selectAll(".roundmarker")
-            .attr("cx", function(d, i){
-              return xRoundScale(i);
-            })
-            .transition()
-            .duration(dur/2)
-            .attr("r", 4)
-
-          gXLabelAxis.transition()
-            .duration(dur/2)
-            .style("opacity", 1);
-
-          gXAxis.transition()
-            .duration(dur/2)
-            .style("opacity", 0);
-
-          d3.select("#yLabel")
-            .text("Rounds (" +  years[currYear] + ")")
-            .transition()
-            .duration(dur/2)
-            .style("opacity", 1)
-
-
-        });
-
-
-
-      d3.select(".zoom-out")
-        .style("pointer-events", "all")
-        .style("opacity", 1)
-      d3.select(this)
-        .style("pointer-events", "none")
-        .style("opacity", 0)
-    })
-
-    //Add rectangles for zooming out mouse interaction
-    gMouseListener.append("rect")
-      .attr("class", "zoom-out")
-      .attr("x", margin)
-      .attr("y", margin)
-      .attr("width", width-2*margin)
-      .attr("height", height-2*margin)
-      .attr("fill", "#FFF")
-      .style("opacity", 0)
-      .style("pointer-events", "none")
-      .on("mouseover", function(){
-        d3.select(this).attr("fill", "#F5F5F5")
-      })
-      .on("mouseout", function(){
-        d3.select(this).attr("fill", "#FFF")
-      })
-      .on("click", function(d){
-        console.log("Zoom out")
-        var dur = 1000;
-
-        xZoomedScale.domain(d3.extent(years))
-        d3.selectAll(".roundmarker")
-          .attr("cx", function(d, i){
-            return xRoundScale(i);
-          })
-          .transition()
-          .duration(dur/2)
-          .attr("r", 0)
-        gXAxis.transition()
-          .duration(dur)
-          .call(xAxis.ticks(years.length));
-
-        gXLabelAxis.transition()
-          .duration(dur/2)
-          .style("opacity", 0);
-
-        gXAxis.transition()
-          .duration(dur/2)
-          .style("opacity", 1);
-
-        d3.selectAll(".marker")
-          .transition()
-          .duration(dur)
-          .attr("cx", function(d, i){
-            return xScale(d.year);
-          })
-          .on("end", function(){
-            d3.select("#yLabel")
-              .text("Year")
-              .transition()
-              .duration(dur/2)
-              .style("opacity", 1)
-
-          })
-
-
-        d3.select("#yLabel")
-          .transition()
-          .duration(dur/2)
-          .style("opacity", 0)
-
-        d3.select("#line")
-          .transition()
-          .duration(dur)
-          .attrTween('d', function (d) {
-            return d3.interpolatePath(roundLine(roundData), line(yearData));
-          })
-
-
-        d3.selectAll(".zoom-in")
-          .style("pointer-events", "all")
-          .style("opacity", 1)
-        d3.select(this)
-          .style("pointer-events", "none")
-          .style("opacity", 0)
-      })
-      .style("cursor", "pointer")
 
 
     //Add markers for data
-    gMarkers.append("clipPath")
-      .attr("id", "marker-clip")
-      .append("rect")
-        .attr("x", margin)
-        .attr("y", 0)
-        .attr("width", width-margin*2)
-        .attr("height", height-margin)
-
-    var line = d3.line()
-      .x(function(d, i) { return xScale(d.year); })
-      .y(function(d) { return yScale(d.placement); })
-      .curve(d3.curveCatmullRom)
-
-    var roundLine = d3.line()
-      .x(function(d, i) { return xRoundScale(i); })
-      .y(function(d) { return yScale(d.placement); })
-      .curve(d3.curveCatmullRom)
 
 
-    gMarkers.append("g")
-      .attr("id", "line-g")
 
-    gMarkers.append("g")
-      .attr("id", "year-markers")
+}
 
-    gMarkers.append("g")
-      .attr("id", "round-markers")
+let xRoundScale;
 
+let xRoundLabelScale = d3.scaleOrdinal();
 
-    gMarkers.select("#line-g").append("path")
-      .datum(yearData)
-      .attr("id", "line")
-      .attr("d", line)
-      .attr("fill", "none")
-      .attr("stroke", "#70a7ff")
-      .attr("stroke-linejoin", "round")
-      .attr("stroke-linecap", "round")
-      .attr("stroke-width", 1.5)
-      .attr("clip-path", "url(#marker-clip)");
+function updateXRoundLabelScale(i){
+  year = years[i]
+  var labels = [year - 1];
+  var range = [margin];
+  console.log(yearRounds)
+  for(var j = 1; j < yearRounds[i]; j++){
+    labels.push(j);
+    range.push(margin + (width-2*margin)/yearRounds[i]*j)
+  }
+  labels.push(year);
+  range.push(width - margin);
+  console.log("labels", labels);
+  console.log("range", range);
+  xRoundLabelScale.domain(labels).range(range)
+  console.log(xRoundLabelScale);
+}
 
-    gMarkers.select("#year-markers").selectAll("circle")
-      .data(yearData)
-      .enter()
-      .append("circle")
-        .attr("class", "marker")
-        .attr("r", 6)
-        .attr("cx", function(d, i){
-          console.log(xScale(d.year))
-          return xScale(d.year);
-        })
-        .attr("cy", function(d){
-          return yScale(d.placement);
-        })
-        .attr("fill", "#5697ff")
-        .attr("clip-path", "url(#marker-clip)");
+function updateXRoundScale(){
+  var roundsRange = [];
+  var roundsDomain = [];
+  var roundCount = -1;
+  for(var i = 0; i <= years.length; i++){
+    var year = i < years.length ? years[i] - 1 : years[i-1];
+    roundsRange.push(xZoomedScale(year));
+    roundsDomain.push(roundCount);
+    roundCount += yearRounds[i];
+  }
+  console.log("ROUNDS DOMAIN:", roundsDomain)
+  console.log("ROUNDS RANGE:", roundsRange)
 
-      gMarkers.select("#round-markers").selectAll("circle")
-        .data(roundData)
-        .enter()
-        .append("circle")
-          .attr("class", "roundmarker")
-          .attr("r", 0)
-          .attr("cx", function(d, i){
-            return xRoundScale(i);
-          })
-          .attr("cy", function(d){
-            return yScale(d.placement);
-          })
-          .attr("fill", "#5697ff")
-          .attr("clip-path", "url(#marker-clip)")
-          .style("opacity", 0.8);
-
-
+  xRoundScale = d3.scaleLinear()
+    .domain(roundsDomain)
+    .range(roundsRange)
 }
