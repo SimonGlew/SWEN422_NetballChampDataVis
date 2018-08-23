@@ -13,6 +13,16 @@ RivalComparison.loadRivalComparisonRow = function(team, startYear, endYear, fina
   // var vsTeam = "Central Pulse";
   $('.rival-chart-wrapper').empty();
   RivalComparison.loadRivalsTable(RivalComparison.team, startYear, endYear, finals);
+
+  $('#rival-check').click(function(e){
+    if($('#rival-check').prop("checked")){
+      $('.non-rival').hide();
+
+    }
+    else{
+      $('.non-rival').show();
+    }
+  })
   // RivalComparison.loadPreviousGamesChart(team, vsTeam, 2008, 2013, "all");
 }
 
@@ -23,10 +33,20 @@ RivalComparison.loadRivalsTable = function(team, startYear, endYear, finals){
     if(res){
       var tBody = $('.rival-table-body');
       tBody.empty();
-      res.forEach((e) =>{
+      res.forEach((e, index) =>{
         var tr = $('<tr class="unselectable"></tr>');
         tr.addClass("clickable-row");
         tr.css("cursor", "pointer")
+
+        if(e.isRival){
+          tr.addClass("rival");
+        }
+        else{
+          if($('#rival-check').prop("checked")){
+            tr.hide();
+          }
+          tr.addClass("non-rival");
+        }
 
         var name = $('<td class="td-name"></td>');
         name.text(e.name);
@@ -41,7 +61,10 @@ RivalComparison.loadRivalsTable = function(team, startYear, endYear, finals){
         tr.append(winrate);
         tr.append(pointsDiff);
         tBody.append(tr);
-
+        if(index === 0){
+          tr.addClass("clicked-row");
+          RivalComparison.loadPreviousGamesChart(RivalComparison.team,e.name,RivalComparison.startYear,RivalComparison.endYear,RivalComparison.finals);
+        }
       })
     }
 
@@ -53,6 +76,8 @@ RivalComparison.loadRivalsTable = function(team, startYear, endYear, finals){
     })
 
   })
+
+
 }
 
 
