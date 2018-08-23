@@ -144,3 +144,7 @@ thead{
 span.block{
   display:block;
 }
+
+.smallFont{
+  font-size: 0.75rem
+}
