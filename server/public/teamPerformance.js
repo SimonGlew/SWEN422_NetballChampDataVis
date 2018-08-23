@@ -10,7 +10,6 @@ TeamPerformance.loadPerformanceRow = function(){
 
 function createGraph(data){
   var zoomedIn = false;
-
   //TODO load this from data
 
   console.log(data)
@@ -44,7 +43,7 @@ function createGraph(data){
 
 
   //Set width and height of chart svg
-  let width = container.node().getBoundingClientRect().width/2;
+  let width = container.node().getBoundingClientRect().width;
   let height = 400;
 
   //Set svg width to container width and arbitrary height
