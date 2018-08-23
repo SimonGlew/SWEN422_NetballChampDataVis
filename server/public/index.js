@@ -60,7 +60,7 @@ function setYearSlider(){
     },
     range:true,
     min:2008,
-    max:2014,
+    max:2013,
     step:1,
     values:[2008,2009],
     animate:true
@@ -77,7 +77,7 @@ function reload(){
   var team = $('#team').val();
   var sliderVals = $('.year-slider').slider("values");
   var startYear = sliderVals[0];
-  var endYear = sliderVals[1] -1;
+  var endYear = sliderVals[1];
   var format = $('#format').val();
 
   console.log("setting title");

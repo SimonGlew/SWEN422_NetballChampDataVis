@@ -180,7 +180,7 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
       })
       .attr("width", x.bandwidth())
       .on("mouseover", function(d){
-        showTooltip(100,100,'<span>Jack</span>');
+        showTooltip(500,500,'<span>Jack</span>');
       })
       .transition()
       .attr("y", function(d){
