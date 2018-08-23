@@ -19,9 +19,10 @@ function showTooltip(left, top, html) {
   $('#tooltip').html(html)
 
   let height = $('#tooltip').height()
-  $('#tooltip').css('top', (top + height))
+  $('#tooltip').css('top', (top-height))
 
   d3.select('#tooltip')
+    .style("z-index", 1000)
     .transition()
     .duration(200)
     .style("opacity", 1);
@@ -31,7 +32,14 @@ function hideTooltip() {
   d3.select('#tooltip')
     .transition()
     .duration(200)
-    .style("opacity", 0);
+    .style("opacity", 0)
+    .on("end", function(d){
+      d3.select('#tooltip')
+        .style("z-index", -1)
+    })
+
+
+
 }
 
 function setTeamSelect(){
