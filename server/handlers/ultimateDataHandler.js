@@ -150,7 +150,7 @@ function getAllTeams() {
  * @param {String} endYear - year to finish looking at
  * @param {String} finals - rounds to filter by (all, regular, finals)
  * 
- * @param {[name: String, winrateVS: String, totalPointsDiff: Number, isRival: boolean]} rivalInfo - information about all other teams in competition
+ * @param {[name: String, winrateVS: String, totalPointsDiff: Number, isRival: boolean, gamesPlayed: Number, gamesWon: Number]} rivalInfo - information about all other teams in competition
  */
 function getRivalsInformation(team, startYear, endYear, finals) {
 	let otherTeams = {}
@@ -184,6 +184,8 @@ function getRivalsInformation(team, startYear, endYear, finals) {
 		let otherTeamObj = otherTeams[key]
 		let teamObj = {
 			name: key,
+			gamesPlayed: otherTeamObj.timesPlayed,
+			gamesWon: otherTeamObj.timesWon,
 			winrateVS: (((otherTeamObj.timesWon / otherTeamObj.timesPlayed) * 100).toFixed(0)) + '%',
 			totalPointsDiff: otherTeamObj.pointsDiff
 		}
@@ -249,7 +251,7 @@ function getPreviousGamesVS(team, vsTeam, startYear, endYear, finals) {
  * @param {String} endYear - year to finish looking at
  * @param {String} finals - rounds to filter by (all, regular, finals)
  * 
- * @param {home: Venue[], away: Venue[]} venues - venues team played at sorted into home and away lists
+ * @param {Venue[]} venues - venues team played at sorted by amount of games played at venue
  */
 function getVenues(team, startYear, endYear, finals) {
 	let venues = { home: {}, away: {} }
@@ -295,21 +297,21 @@ function getVenues(team, startYear, endYear, finals) {
 		}
 	})
 
-	let obj = { home: [], away: [] }
+	let obj = []
 
-	//Format home venues from a map to an array and sort it by games played at venue
+	//Format home venues from a map into the array and sort it by games played at venue
 	Object.keys(venues.home).forEach(key => {
-		let v = venues.home[key]
-		obj.home.push({ venue: key, played: v.timesPlayed, won: v.timesWin, win_rate: (v.timesWin / v.timesPlayed) * 100 })
+		let v = venues.home[key] + ' (home)'
+		obj.push({ venue: key, played: v.timesPlayed, won: v.timesWin, win_rate: (v.timesWin / v.timesPlayed) * 100 })
 	})
-	obj.home.sort((a, b) => b.played - a.played)
 
 	//Format away venues from a map to an array and sort it by games played at venue
 	Object.keys(venues.away).forEach(key => {
-		let v = venues.away[key]
-		obj.away.push({ venue: key, played: v.timesPlayed, won: v.timesWin, win_rate: (v.timesWin / v.timesPlayed) * 100 })
+		let v = venues.away[key] + ' (away)'
+		obj.push({ venue: key, played: v.timesPlayed, won: v.timesWin, win_rate: (v.timesWin / v.timesPlayed) * 100 })
 	})
-	obj.away.sort((a, b) => b.played - a.played)
+
+	obj.sort((a, b) => b.played - a.played)
 
 	return obj
 }
