@@ -179,6 +179,9 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
         return x(i);
       })
       .attr("width", x.bandwidth())
+      .on("mouseover", function(d){
+        showTooltip(100,100,'<span>Jack</span>');
+      })
       .transition()
       .attr("y", function(d){
         if(d.pointsDiff > 0){
