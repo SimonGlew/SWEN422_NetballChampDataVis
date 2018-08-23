@@ -42,9 +42,10 @@ VenueComparison.drawGraph = function () {
 		.range([0, width])
 		.domain(VenueComparison.venueList)
 
-	var xAxis = d3.axisBottom(x)
-		//.attr("class", "axis axis--x")
-		.ticks(VenueComparison.venueList.length)
+	var xAxis = g.append("g")
+		.attr("class", "axis axis--x")
+		.attr("transform", "translate(0," + height + ")")
+		.call(d3.axisBottom(x).ticks(VenueComparison.venueList.length))
 
 	var yAxis = g.append("g")
 		.attr("class", "axis axis--y")
@@ -66,8 +67,8 @@ VenueComparison.drawGraph = function () {
 		.attr("y", function (d) {
 			return y(d.win_rate);
 		})
-		.attr("x", function (d, i) {
-			return x(i);
+		.attr("x", function (d) {
+			return x(d.venue);
 		})
 		.attr("width", 20)
 

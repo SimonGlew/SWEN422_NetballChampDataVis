@@ -15,8 +15,8 @@ function init(){
 }
 
 function showTooltip(left, top, html) {
-  $('#tooltip').css({ display: 'block', left: left })
-  $('#innerTooltip').html(html)
+  $('#tooltip').css('left', left)
+  $('#tooltip').html(html)
 
   let height = $('#tooltip').height()
   $('#tooltip').css('top', (top + height))
@@ -32,8 +32,6 @@ function hideTooltip() {
     .transition()
     .duration(200)
     .style("opacity", 0);
-
-  $('#tooltip').css({ display: 'none' })
 }
 
 function setTeamSelect(){
