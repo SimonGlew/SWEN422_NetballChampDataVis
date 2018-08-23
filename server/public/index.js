@@ -8,14 +8,19 @@ function init(){
   setYearSlider();
   setTeamSelect();
   setReload();
+  setupTeamPerformance()
   reload();
-
 
 
 }
 
 function setTeamSelect(){
   // $("#team").selectmenu();
+}
+
+function setupTeamPerformance(){
+  TeamPerformance.createGraph();
+  // TeamPerformance.loadPerformanceRow(team,startYear,endYear,format);
 }
 
 function setYearSlider(){
@@ -61,7 +66,7 @@ function reload(){
   var format = $('#format').val();
   console.log("loading charts with ...",team,startYear,endYear);
 
-  TeamPerformance.loadPerformanceRow();
   RivalComparison.loadRivalComparisonRow(team,startYear,endYear,format);
   VenueComparison.loadVenueComparisonRow();
+  TeamPerformance.loadData(team,startYear,endYear,format);
 }
