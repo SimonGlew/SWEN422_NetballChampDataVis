@@ -7,7 +7,8 @@ function init(){
   console.log("init");
   setYearSlider();
   setTeamSelect();
-  setReload();
+  setFormat();
+  // setReload();
   setupTeamPerformance()
   reload();
 
@@ -43,13 +44,22 @@ function hideTooltip() {
 }
 
 function setTeamSelect(){
-  // $("#team").selectmenu();
+  $("#team").change(function(e){
+    reload();
+  })
+}
+
+function setFormat(){
+  $('#format').change(function(e){
+    reload();
+  })
 }
 
 function setupTeamPerformance(){
   TeamPerformance.createGraph();
   // TeamPerformance.loadPerformanceRow(team,startYear,endYear,format);
 }
+
 
 function setYearSlider(){
   var handleA = $(".year-handle.lower-handle");
@@ -71,6 +81,10 @@ function setYearSlider(){
 
       }
     },
+    stop: function(e,ui){
+      setHandleTimer(handleA.text(), handleB.text());
+
+    },
     range:true,
     min:2008,
     max:2013,
@@ -78,6 +92,16 @@ function setYearSlider(){
     values:[2008,2009],
     animate:true
   });
+}
+
+function setHandleTimer(lower, higher){
+  var i = setTimeout((res)=>{
+    var handleA = $(".year-handle.lower-handle");
+    var handleB = $(".year-handle.upper-handle");
+    if(handleA.text() === lower && handleB.text() === higher){
+      reload();
+    }
+  },250)
 }
 
 function setReload(){
