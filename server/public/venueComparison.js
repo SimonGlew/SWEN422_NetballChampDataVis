@@ -56,13 +56,8 @@ VenueComparison.drawGraph = function () {
 		.enter().append("rect")
 		.attr("class", function (d) {
 			var c = "";
-			if (d.home) {
-				c += " bar-home";
-			}
-			else {
-				c += " bar-away";
-			}
-			return c;
+			if (d.home) return "bar-home"
+			else return "bar-away"
 		})
 		.attr("y", function (d) {
 			return y(d.win_rate);
@@ -71,6 +66,9 @@ VenueComparison.drawGraph = function () {
 			return x(d.venue);
 		})
 		.attr("width", 20)
+		.attr('height', function(d){
+			return height - y(d.win_rate); 
+		})
 
 }
 
