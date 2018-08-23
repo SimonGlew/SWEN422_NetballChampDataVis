@@ -1,23 +1,29 @@
-
 <!doctype html>
 <html>
+
 <head>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+    crossorigin="anonymous" />
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
 
   <link rel="stylesheet" href="styles.css" />
 
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E="
+    crossorigin="anonymous"></script>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
   <script src="./js/d3-interpolate-path.js"></script>
   <script src="https://d3js.org/d3.v5.min.js"></script>
 
 
   <title>ANZ Championship DataVis</title>
 </head>
+
 <body>
   <nav class="navbar navbar-dark navbar-fixed-top sticky-top ">
     <div class="container-fluid">
@@ -51,7 +57,7 @@
       <div class="col-sm-2 form-group">
         <label class="white" for="format">Select a Format:</label>
         <select name="format" id="format" class="form-control">
-          <option value="regular" >Regular</option>
+          <option value="regular">Regular</option>
           <option value="finals">Finals</option>
           <option value="all" selected>All</option>
         </select>
@@ -61,80 +67,86 @@
         <button class="btn btn-white reload-button" type="button">Reload</button>
 
       </div>
-    </nav>
+  </nav>
 
-    <div class="main container-fluid">
-      <div class="row">
-
-
-
-        <div class="col-sm-1">
-
-        </div>
+  <div class="main container-fluid">
+    <div class="row">
 
 
-        <div class="col-sm-1">
 
-        </div>
+      <div class="col-sm-1">
 
       </div>
-      <hr/>
 
 
-      <div id="team-title-container" class="">
-        <h1 id="team-title"></h1>
+      <div class="col-sm-1">
 
-      </div>
-      <hr/>
-
-
-
-      <div id="team-performance-container" class="row">
-        <svg class="team-performance-chart"/>
-      </div>
-      <div id="venue-comparison-container" class="row">
-
-
-      </div>
-      <div id="rival-comparison-container" class="row">
-        <div class="rival-title row col-sm-12">
-          <h3 class="col-sm-12">Opposition Comparisons</h3>
-        </div>
-        <div class="row col-sm-12">
-          <div class="rival-check form-check col-sm-12">
-            <input class="form-check-input" type="checkbox" value="" id="rival-check">
-            <label class="form-check-label" for="rival-check">
-              Show Rivals Only
-            </label>
-          </div>
-        </div>
-        <div class="table-wrapper col-sm-5">
-
-          <table class="rivals-table table table-bordered table-hover">
-            <thead>
-              <tr>
-                <th scope="col" style="width:300px">Team</th>
-                <th scope="col">Winrate VS</th>
-                <th scope="col">Points Diff</th>
-              </tr>
-              <tbody class="rival-table-body">
-
-              </tbody>
-            </thead>
-          </table>
-        </div>
-        <div class="rival-chart-wrapper col-sm-7">
-          <!-- <svg class="rival-comparison-chart"></svg> -->
-
-        </div>
       </div>
 
     </div>
+    <hr/>
 
-    <script src="./teamPerformance.js"></script>
-    <script src="./rivalComparison.js"></script>
-    <script src="./venueComparison.js"></script>
-    <script src="./index.js"></script>
 
-  </body>
-  </html>
+    <div id="team-title-container" class="">
+      <h1 id="team-title"></h1>
+
+    </div>
+    <hr/>
+
+
+
+    <div id="team-performance-container" class="row">
+      <svg class="team-performance-chart" />
+    </div>
+    <div id="venue-comparison-container" class="row">
+
+
+    </div>
+    <div id="rival-comparison-container" class="row">
+      <div class="rival-title row col-sm-12">
+        <h3 class="col-sm-12">Opposition Comparisons</h3>
+      </div>
+      <div class="row col-sm-12">
+        <div class="rival-check form-check col-sm-12">
+          <input class="form-check-input" type="checkbox" value="" id="rival-check">
+          <label class="form-check-label" for="rival-check">
+            Show Rivals Only
+          </label>
+        </div>
+      </div>
+      <div class="table-wrapper col-sm-5">
+
+        <table class="rivals-table table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th scope="col" style="width:300px">Team</th>
+              <th scope="col">Winrate VS</th>
+              <th scope="col">Points Diff</th>
+            </tr>
+            <tbody class="rival-table-body">
+
+            </tbody>
+          </thead>
+        </table>
+      </div>
+      <div class="rival-chart-wrapper col-sm-7">
+        <!-- <svg class="rival-comparison-chart"></svg> -->
+
+      </div>
+    </div>
+
+  </div>
+
+  <div id='tooltip'>
+    <div id='innerTooltip' style='position:absolute;opacity:0;display:none;z-index:1000;max-width:150px;min-width:100px;min-height:100px;background-color:lightgrey;border-radius: 5px;border:3px solid black;'>
+    </div>
+  </div>
+
+  <script src="./teamPerformance.js"></script>
+  <script src="./rivalComparison.js"></script>
+  <script src="./venueComparison.js"></script>
+  <script src="./index.js"></script>
+
+</body>
+
+</html>

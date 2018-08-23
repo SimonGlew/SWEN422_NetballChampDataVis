@@ -14,6 +14,25 @@ function init(){
 
 }
 
+function showTooltip(right, top, html) {
+  $('#tooltip').css({ display: 'block', right: right, top: top })
+  $('#innerTooltip').html(html)
+
+  d3.select('#tooltip')
+    .transition()
+    .duration(200)
+    .style("opacity", 1);
+}
+
+function hideTooltip() {
+  d3.select('#tooltip')
+    .transition()
+    .duration(200)
+    .style("opacity", 0);
+
+  $('#tooltip').css({ display: 'none' })
+}
+
 function setTeamSelect(){
   // $("#team").selectmenu();
 }
