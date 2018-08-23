@@ -195,7 +195,7 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
 
 
       svg.append("text")
-        .attr("x", (width/2))
+        .attr("x", ((width + margin.left + margin.right)/2))
         .attr("y", (margin.top /2))
         .attr("text-anchor", "middle")
         .style("font-size", "16px")

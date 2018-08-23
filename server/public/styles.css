@@ -1,6 +1,9 @@
 .navbar{
   background-color: #33d6ad;
 }
+.navbar-brand{
+  font-size: 24px;
+}
 
 
 .main{

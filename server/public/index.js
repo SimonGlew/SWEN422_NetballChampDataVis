@@ -59,7 +59,10 @@ function reload(){
   var startYear = sliderVals[0];
   var endYear = sliderVals[1] -1;
   var format = $('#format').val();
-  console.log("loading charts with ...",team,startYear,endYear);
+
+  console.log("setting title");
+  $('#team-title').text(team + ', years ' + startYear + " to "+sliderVals[1]);
+  console.log("loading charts with ...",team,startYear,sliderVals[1]);
 
   TeamPerformance.loadPerformanceRow();
   RivalComparison.loadRivalComparisonRow(team,startYear,endYear,format);
