@@ -284,7 +284,7 @@ function getVenues(team, startYear, endYear, finals) {
 				//Filter out games that dont match the finals flag
 				if (finals == 'all' || (finals == 'regular' && (parseInt(awayGame.round) <= maxRound - 3)) || (finals == 'finals' && (parseInt(awayGame.round) > maxRound - 3))) {
 					//initalise venue in map if not seen before
-					if (!venues.home[awayGame.venue]) {
+					if (!venues.away[awayGame.venue]) {
 						venues.away[awayGame.venue] = { timesPlayed: 0, timesWin: 0 }
 					}
 					//if winning team, add one to timesWin

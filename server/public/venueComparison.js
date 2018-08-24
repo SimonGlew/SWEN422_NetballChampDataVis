@@ -70,16 +70,14 @@ VenueComparison.drawGraph = function (team) {
 			if (d.home) return "bar-home"
 			else return "bar-away"
 		})
-		.attr("y", function (d) {
-			return y(d.win_rate);
-		})
 		.attr("x", function (d) {
 			return x(d.venue);
 		})
-		.attr("width", x.bandwidth())
-		.attr('height', function (d) {
-			return axisHeight - y(d.win_rate);
+		.attr("y", function(d) {
+			return y(0);
 		})
+		.attr("height", 0)
+		.attr("width", x.bandwidth())
 		.on("mouseover", function (d) {
 			let x = d3.event.x, y = d3.event.y
 
@@ -87,7 +85,7 @@ VenueComparison.drawGraph = function (team) {
 
 			let html = '<div>' +
 				'<span class="block smallFont"><b>Venue: </b>' + split[0] + '</span >' +
-				(split.length == 2 ? '<span class="block smallFont"><b>At: </b>' + split[1] + '</span >' : '') +
+				(split.length == 2 ? '<span class="block smallFont"><b>At: </b>' + split[1] + '</span ></br>' : '</br>') +
 				(d.home ? '<span class="block smallFont">Home Venue</span>' : '<span class="block smallFont">Away Venue</span>') +
 				'<span class="block smallFont"><b>Games Played: </b>' + d.played + '</span>' +
 				'<span class="block smallFont"><b>Games Won: </b>' + d.won + '</span>' +
@@ -99,6 +97,15 @@ VenueComparison.drawGraph = function (team) {
 		.on("mouseout", function (d) {
 			hideTooltip()
 		})
+		.transition()
+		.duration(500)
+		.attr("y", function (d) {
+			return y(d.win_rate);
+		})
+		.attr('height', function (d) {
+			return axisHeight - y(d.win_rate);
+		})
+
 
 	svg.append("text")
 		.attr("transform", "rotate(-90)")
@@ -135,8 +142,13 @@ VenueComparison.drawGraph = function (team) {
 		.attr("width", x.bandwidth())
 		.attr("dx", x.bandwidth() / 2)
 		.attr("text-anchor", "middle")
+		.style('opacity', 0)
 		.text(function (d) {
 			return d.win_rate.toFixed(0) + '%'
 		})
+		.transition()
+			.delay(250)
+			.duration(250)
+			.style('opacity', 1)
 
 }
