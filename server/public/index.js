@@ -89,7 +89,7 @@ function setYearSlider(){
     min:2008,
     max:2013,
     step:1,
-    values:[2008,2009],
+    values:[2008,2013],
     animate:true
   });
 }
