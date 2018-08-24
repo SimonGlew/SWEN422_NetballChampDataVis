@@ -7,6 +7,8 @@ TeamPerformance.createGraph = function createGraph(){
 }
 
 let showingData = false;
+
+//Fields for storing filtering parameters
 let startYear;
 let endYear;
 let finals;
@@ -57,6 +59,7 @@ let xScale, xAxis;
 let yScale, yAxis;
 
 function setupAxis(){
+  //Create x axis
   var defaultScale = [2008, 2013];
   xScale = d3.scaleLinear()
     .domain(defaultScale)
@@ -70,6 +73,7 @@ function setupAxis(){
     .attr("transform", "translate(0, " + (height - margin) + ")")
     .call(xAxis);
 
+  //Create y axis
   yScale = d3.scaleLinear()
     .domain([1, numTeams])
     .range([margin, height-margin]);
@@ -82,12 +86,14 @@ function setupAxis(){
     .attr("transform", "translate(" + margin + ", 0)")
     .call(yAxis);
 
+  //X axis for diplaying ordinal scale for rounds labels
   d3.select("#g-xLabelAxis").attr("class", "xLabelAxis")
     .attr("transform", "translate(0, " + (height - margin) + ")")
     .style("opacity", 0)
 }
 
 function setupLabels(){
+  //Create y axis label
   d3.select(".team-performance-chart").append("text")
     .attr("transform", "rotate(-90)")
     .attr("y", 0)
@@ -96,12 +102,14 @@ function setupLabels(){
     .style("text-anchor", "middle")
     .text("Placing");
 
+  //Create x axis label
   d3.select(".team-performance-chart").append("text")
     .attr("id", "xLabel")
     .attr("transform", "translate(" + (width/2) + " ," + (height - margin/3) + ")")
     .style("text-anchor", "middle")
     .text("Year");
 
+   //Create title
    d3.select(".team-performance-chart").append("text")
     .attr("id", "title")
     .attr("transform", "translate(" + (width/2) + " ," + (margin/3) + ")")
@@ -111,16 +119,19 @@ function setupLabels(){
     .text("")
 }
 
+//Duration for creating graph
 let buildDur = 250;
 
+//Fields for formatting of data
 let years;
 let yearData;
 let yearRounds;
 let roundData;
-
 let data;
+
 function createGraph(){
   processData(data, startYear, endYear);
+  //Create zomedScale for scaling xAxis when drilling down
   xZoomedScale = d3.scaleLinear()
     .domain(d3.extent(years))
     .range([margin, width-margin])
@@ -133,13 +144,18 @@ function createGraph(){
 }
 
 function processData(data, startYear, endYear){
+  //Create array of years in dataset
   years = [];
   for(var i = startYear; i <= endYear; i++){
     years.push(i);
   }
+  //Number of rounds in each year
   yearRounds = [];
+  //List of year objects for plotting data
   yearData = [];
+  //List of round objects for plotting data of finer granularity
   roundData = [];
+  //Loop over dataset to populate above fields
   for(var i = 0; i < data.length; i++){
     if(data[i].year >= startYear && data[i].year <= endYear){
       yearRounds.push(data[i].rounds.length);
@@ -157,10 +173,15 @@ function updateAxis(){
     .transition()
     .duration(buildDur)
     .call(xAxis.ticks(years.length))
+  //When 3 or less years are being displayed, this gives the incorrect number of ticks. No idea why.
+  d3.select("#xLabel")
+    .text("Year")
+    .transition()
+    .duration(buildDur)
+    .style("opacity", 1)
 }
 
 function updateTitle(){
-  xScale.domain(d3.extent(years));
   d3.select("#title")
     .text(team + " Placings, " + startYear + " - " + endYear)
     .transition()
@@ -195,7 +216,7 @@ function addMouseListeners(data){
     })
     .on("click", zoomIn)
 
-    //Add rectangles for zooming out mouse interaction
+  //Add rectangle for zooming out mouse interaction
   d3.select("#mouse-listeners").append("rect")
     .attr("class", "zoom-out")
     .attr("x", margin)
@@ -215,11 +236,13 @@ function addMouseListeners(data){
     .style("cursor", "pointer")
 }
 
+//Line equations for years, zoomed in years, and rounds placements.
 let initialLine;
 let line;
 let roundLine;
 
 function plotData(data){
+  //Clipping rectangle for graph
   d3.select("#markers").append("clipPath")
     .attr("id", "marker-clip")
     .append("rect")
@@ -228,6 +251,7 @@ function plotData(data){
       .attr("width", width-margin*2)
       .attr("height", height-margin)
 
+  //Define line equations
   initialLine = d3.line()
     .x(function(d, i) { return xScale(d.year);})
     .y(function(d) { return yScale(10);})
@@ -243,6 +267,7 @@ function plotData(data){
     .y(function(d) { return yScale(d.placement); })
     .curve(d3.curveCatmullRom)
 
+  //Groups for storing markers and lines
   d3.select("#markers").append("g")
     .attr("id", "line-g")
 
@@ -252,6 +277,7 @@ function plotData(data){
   d3.select("#markers").append("g")
     .attr("id", "round-markers")
 
+  //Plot line on graph
   d3.select("#markers").select("#line-g").append("path")
     .datum(yearData)
     .attr("id", "line")
@@ -267,6 +293,7 @@ function plotData(data){
     .duration(buildDur)
     .attr("d", line);
 
+  //Add markers for each year
   d3.select("#markers").select("#year-markers").selectAll("circle")
     .data(yearData)
     .enter()
@@ -297,6 +324,7 @@ function plotData(data){
       })
       .attr("r", 6);
 
+    //Add markers for each round
     d3.select("#markers").select("#round-markers").selectAll("circle")
       .data(roundData)
       .enter()
@@ -323,6 +351,7 @@ function plotData(data){
         .style("opacity", 0.8);
 }
 
+//Remove data so new data can be visualized.
 function removeData(){
   removeAxis();
   removeMouseListeners();
@@ -342,6 +371,9 @@ function removeAxis(){
     .transition()
     .duration(buildDur)
     .style("opacity", 0)
+
+  d3.select("#xLabel")
+    .style("opacity", 0)
 }
 
 function removeTitle(){
@@ -358,6 +390,7 @@ function removeMouseListeners(){
 }
 
 function removePlot(){
+  //Remove markers
   d3.selectAll(".marker")
     .transition()
     .duration(buildDur)
@@ -377,6 +410,7 @@ function removePlot(){
       d3.select(this).remove()
     })
 
+  //Remove line
   d3.select("#line")
     .transition()
     .duration(buildDur)
@@ -389,20 +423,17 @@ function removePlot(){
 
 let yearIndex;
 
+//Function that zooms into a finer level of granularity when clicking on graph.
 function zoomIn(year, index){
   yearIndex = index;
   currYear = year;
   var dur = 1000;
 
+  //Update axis to show only one year worth of data
   xZoomedScale.domain([year-1, year])
   updateXRoundScale();
   updateXRoundLabelScale(year);
   xScale.domain(d3.extent(years))
-
-  d3.selectAll(".zoom-out")
-    .style("pointer-events", "none")
-  d3.selectAll(".zoom-in")
-    .style("pointer-events", "none")
 
   d3.select("#xLabel")
     .transition()
@@ -419,6 +450,13 @@ function zoomIn(year, index){
     .duration(dur)
     .call(xAxis.ticks(1))
 
+  //Disable mouse events whilst transitioning
+  d3.selectAll(".zoom-out")
+    .style("pointer-events", "none")
+  d3.selectAll(".zoom-in")
+    .style("pointer-events", "none")
+
+  //Update marker positions as zooming into data
   d3.selectAll(".marker")
     .transition()
     .duration(dur)
@@ -426,8 +464,7 @@ function zoomIn(year, index){
       return xZoomedScale(d.year);
     })
 
-
-
+  //Zoom into line as it changes to show finer granularity of data.
   d3.select("#line")
     .transition()
     .duration(dur)
@@ -435,16 +472,19 @@ function zoomIn(year, index){
       return d3.interpolatePath(line(yearData), roundLine(roundData));
     })
     .on("end", function(){
+      //Display round markers
       d3.selectAll(".roundmarker")
         .style("fill", function(d, i){
+          //Colour point differently if selecting regular or finals only
           if(d.round > yearRounds[yearIndex] - 3){
             if(finals == "finals"){
               return "#33d6ad";
             }
+          }else{
+            if(finals == "regular"){
+              return "#33d6ad"
+            }
           }
-        })
-        .style("stroke-width", function(d){
-          return "yellow"
         })
         .attr("cx", function(d, i){
           return xRoundScale(i);
@@ -453,6 +493,7 @@ function zoomIn(year, index){
         .duration(dur/2)
         .attr("r", 4)
 
+      //Transition to rounds x axis
       d3.select("#g-xLabelAxis")
         .transition()
         .duration(dur/2)
@@ -468,6 +509,7 @@ function zoomIn(year, index){
         .duration(dur/2)
         .style("opacity", 1)
 
+      //Enable pointer events now transition has ended
       d3.selectAll(".zoom-out")
         .style("pointer-events", "all")
         .style("opacity", 1)
@@ -475,15 +517,18 @@ function zoomIn(year, index){
     });
 }
 
+//Zoom out back to coarser granularity of data
 function zoomOut(){
   var dur = 1000;
 
+  //Disable mouse events while transitioning
   d3.selectAll(".zoom-out")
     .style("pointer-events", "none")
     .style("opacity", 0)
   d3.selectAll(".zoom-in")
     .style("pointer-events", "none")
 
+  //Fade out round markers
   xZoomedScale.domain(d3.extent(years))
   d3.selectAll(".roundmarker")
     .attr("cx", function(d, i){
@@ -493,15 +538,10 @@ function zoomOut(){
     .duration(dur/2)
     .attr("r", 0)
 
+  //Update x axis to year view
   xAxis = d3.axisBottom(xScale)
     .tickFormat(d3.format(".0f"))
     .ticks(years.length)
-
-  console.log("YEARS LENGTH " + years.length)
-  // xAxis.ticks(0)
-
-  console.log(xAxis);
-
 
   d3.select("#g-xAxis")
     .transition()
@@ -516,6 +556,7 @@ function zoomOut(){
     .duration(dur/2)
     .style("opacity", 1);
 
+  //Update position of year markers
   d3.selectAll(".marker")
     .transition()
     .duration(dur)
@@ -523,12 +564,14 @@ function zoomOut(){
       return xScale(d.year);
     })
     .on("end", function(){
+      //Transition x label back to years
       d3.select("#xLabel")
         .text("Year")
         .transition()
         .duration(dur/2)
         .style("opacity", 1)
 
+      //Enable mouse events as transition has finished
       d3.selectAll(".zoom-in")
         .style("pointer-events", "all")
         .style("opacity", function(){
@@ -537,11 +580,13 @@ function zoomOut(){
 
     })
 
+  //Fade out x label
   d3.select("#xLabel")
     .transition()
     .duration(dur/2)
     .style("opacity", 0)
 
+  //Transition line back to years granularity
   d3.select("#line")
     .transition()
     .duration(dur)
@@ -552,14 +597,14 @@ function zoomOut(){
 
 }
 
-
+//Fields for managing ordinal scale of rounds for finer granularity
 let xRoundScale;
 let xRoundAxis;
 let xLabelAxis;
 
-
 let xRoundLabelScale = d3.scaleOrdinal();
 
+//Update ordinal scale for displaying rounds
 function updateXRoundLabelScale(year){
   for(var y = 0; y != years.length; y++){
     var i = y;
@@ -576,6 +621,7 @@ function updateXRoundLabelScale(year){
   xLabelAxis = d3.axisBottom(xRoundLabelScale);
 }
 
+//Calculate properties required for xRoundLabelScale
 function updateXRoundScale(){
   var roundsRange = [];
   var roundsDomain = [];
@@ -594,7 +640,4 @@ function updateXRoundScale(){
   xRoundAxis = d3.axisBottom(xRoundScale)
     .tickFormat(d3.format(".0f"))
     .ticks(16)
-
-
-
 }
