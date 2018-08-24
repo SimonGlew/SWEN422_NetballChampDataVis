@@ -85,8 +85,8 @@ VenueComparison.drawGraph = function (team) {
 
 			let html = '<div>' +
 				'<span class="block smallFont"><b>Venue: </b>' + split[0] + '</span >' +
-				(split.length == 2 ? '<span class="block smallFont"><b>At: </b>' + split[1] + '</span ></br>' : '</br>') +
-				(d.home ? '<span class="block smallFont">Home Venue</span>' : '<span class="block smallFont">Away Venue</span>') +
+				(split.length == 2 ? '<span class="block smallFont"><b>At: </b>' + split[1] + '</span >' : '') +
+				(d.home ? '<span class="block smallFont"><b>Home</b></span>' : '<span class="block smallFont"><b>Away</b></span>') +
 				'<span class="block smallFont"><b>Games Played: </b>' + d.played + '</span>' +
 				'<span class="block smallFont"><b>Games Won: </b>' + d.won + '</span>' +
 				'<span class="block smallFont"><b>Winrate: </b>' + d.win_rate.toFixed(0) + '%</span>' +
@@ -133,6 +133,7 @@ VenueComparison.drawGraph = function (team) {
 		.data(VenueComparison.venueData)
 		.enter()
 		.append('text')
+		.attr('class', 'smallFont')
 		.attr("y", function (d) {
 			return y(d.win_rate) - 5;
 		})
