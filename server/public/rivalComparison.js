@@ -100,7 +100,7 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
     $('.rival-chart-wrapper').empty();
 
     //first make title text, set margins and get width and height qvaialabel
-    var title = team +" Points Differential VS "+vsTeam + ", years "+startYear +" - "+(endYear+1);
+    var title = team +" Points Differential VS "+vsTeam + ", years "+startYear +" - "+(endYear);
     var data = res;
     var margin = {
       top:50,
