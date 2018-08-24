@@ -68,7 +68,7 @@ function setYearSlider(){
   $('.year-slider').slider({
     create: function(e, ui){
         handleA.text(2008);
-        handleB.text(2009);
+        handleB.text(2013);
 
     },
     slide: function(e, ui){
