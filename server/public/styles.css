@@ -133,7 +133,7 @@ thead{
   position:fixed;
   /* max-width:150px; */
   min-width:100px;
-  min-height:100px;
+  min-height:20px;
   background-color:lightgrey;
   border-radius: 5px;
   border:3px solid black;
