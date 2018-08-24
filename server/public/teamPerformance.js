@@ -275,14 +275,12 @@ function plotData(data){
     .append("circle")
       .attr("class", "marker")
       .on("mouseover", function(d){
-        console.log("Mouseover jon")
         var div = $('<div></div>');
         div.append($('<div><span><b>Year:</b> '+d.year+'</span></div>'))
-        div.append($('<div><span><b>Placing:</b> '+d.placing+'</span></div>'))
+        div.append($('<div><span><b>Placing:</b> '+d.placement+'</span></div>'))
         showTooltip(d3.event.x, d3.event.y, div.html());
       })
       .on("mouseout", function(d){
-        console.log("mouseout jon")
         hideTooltip()
       })
       .attr("r", 0)
@@ -314,6 +312,15 @@ function plotData(data){
           return yScale(d.placement);
         })
         .attr("fill", "#5697ff")
+        .on("mouseover", function(d){
+          var div = $('<div></div>');
+          div.append($('<div><span><b>Round:</b> '+d.round+'</span></div>'))
+          div.append($('<div><span><b>Placing:</b> '+d.placement+'</span></div>'))
+          showTooltip(d3.event.x, d3.event.y, div.html());
+        })
+        .on("mouseout", function(){
+          hideTooltip();
+        })
         .attr("clip-path", "url(#marker-clip)")
         .style("opacity", 0.8);
 }
@@ -382,7 +389,10 @@ function removePlot(){
     })
 }
 
-function zoomIn(year){
+let yearIndex;
+
+function zoomIn(year, index){
+  yearIndex = index;
   console.log("Zoom into " + year)
 
   currYear = year;
@@ -430,6 +440,17 @@ function zoomIn(year){
     })
     .on("end", function(){
       d3.selectAll(".roundmarker")
+        .style("fill", function(d, i){
+          if(d.round > yearRounds[yearIndex] - 3){
+            console.log(finals)
+            if(finals == "finals"){
+              return "#33d6ad";
+            }
+          }
+        })
+        .style("stroke-width", function(d){
+          return "yellow"
+        })
         .attr("cx", function(d, i){
           return xRoundScale(i);
         })
