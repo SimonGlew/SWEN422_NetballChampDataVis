@@ -57,9 +57,16 @@ RivalComparison.loadRivalsTable = function(team, startYear, endYear, finals){
         var pointsDiff = $('<td></td>');
         pointsDiff.text(e.totalPointsDiff);
 
+        var gamesPlayed = $('<td></td>');
+        gamesPlayed.text(e.gamesPlayed);
+        var gamesWon = $('<td></td>');
+        gamesWon.text(e.gamesWon);
+
         tr.append(name);
         tr.append(winrate);
         tr.append(pointsDiff);
+        tr.append(gamesPlayed);
+        tr.append(gamesWon);
         tBody.append(tr);
         if(index === 0){
           tr.addClass("clicked-row");
@@ -187,11 +194,11 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
         console.log("MOUSE OVER");
         RivalComparison.generateTooltip(x,y,d.date,d.venue,d.round,d.wasHome?team:vsTeam);
       })
-      // .on("mousemove", function(d){
-      //   var x = d3.event.x;
-      //   var y = d3.event.y;
-      //   RivalComparison.generateTooltip(x,y,d.date,d.venue,d.round,d.wasHome?team:vsTeam);
-      // })
+      .on("mousemove", function(d){
+        var x = d3.event.x;
+        var y = d3.event.y;
+        RivalComparison.generateTooltip(x,y,d.date,d.venue,d.round,d.wasHome?team:vsTeam);
+      })
       .on("mouseout",function(d){
         console.log("MOUSE OUT");
 
@@ -241,9 +248,9 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
 
 RivalComparison.generateTooltip = function(x,y, date, venue, round, homeTeam){
   var div = $('<div></div>');
-  div.append($('<div class="rival-tooltip"><span><b>Date:</b> '+date+'</span></div>'))
-  div.append($('<div class="rival-tooltip"><span><b>Venue:</b> '+venue+'</span></div>'))
-  div.append($('<div class="rival-tooltip"><span><b>Round:</b> '+round+'</span></div>'))
-  div.append($('<div class="rival-tooltip"><span><b>Home Team:</b> '+homeTeam+'</span></div>'))
+  div.append($('<div class="rival-tooltip"><span class="small"><b>Date:</b> '+date+'</span></div>'))
+  div.append($('<div class="rival-tooltip"><span class="small"><b>Venue:</b> '+venue+'</span></div>'))
+  div.append($('<div class="rival-tooltip"><span class="small"><b>Round:</b> '+round+'</span></div>'))
+  div.append($('<div class="rival-tooltip"><span class="small"><b>Home Team:</b> '+homeTeam+'</span></div>'))
   showTooltip(x,y,div.html());
 }

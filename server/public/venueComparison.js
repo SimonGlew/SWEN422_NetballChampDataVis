@@ -94,6 +94,22 @@ VenueComparison.drawGraph = function (team) {
 
 			showTooltip(x, y, html)
 		})
+		.on("mousemove", function (d) {
+			let x = d3.event.x, y = d3.event.y
+
+			let split = d.toolTipVenue.split(',')
+
+			let html = '<div>' +
+				'<span class="block smallFont"><b>Venue: </b>' + split[0] + '</span >' +
+				(split.length == 2 ? '<span class="block smallFont"><b>At: </b>' + split[1] + '</span >' : '') +
+				(d.home ? '<span class="block smallFont"><b>Home</b></span>' : '<span class="block smallFont"><b>Away</b></span>') +
+				'<span class="block smallFont"><b>Games Played: </b>' + d.played + '</span>' +
+				'<span class="block smallFont"><b>Games Won: </b>' + d.won + '</span>' +
+				'<span class="block smallFont"><b>Winrate: </b>' + d.win_rate.toFixed(0) + '%</span>' +
+				'</div>'
+
+			showTooltip(x, y, html)
+		})
 		.on("mouseout", function (d) {
 			hideTooltip()
 		})
