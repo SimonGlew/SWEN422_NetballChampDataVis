@@ -1,19 +1,22 @@
 RivalComparison = {};
 RivalComparison.team = "";
 
+//Method will load the table and rival graph data for the given options
 RivalComparison.loadRivalComparisonRow = function(team, startYear, endYear, finals){
   console.log("Loading Rival data...");
 
-
-
+  //store info
   RivalComparison.team = team;
   RivalComparison.startYear = startYear;
   RivalComparison.endYear = endYear;
   RivalComparison.finals = finals;
-  // var vsTeam = "Central Pulse";
+
+  //remove any old graph and table
   $('.rival-chart-wrapper').empty();
+  //load table information
   RivalComparison.loadRivalsTable(RivalComparison.team, startYear, endYear, finals);
 
+  //set up click listener for the rivals checkbox
   $('#rival-check').click(function(e){
     if($('#rival-check').prop("checked")){
       $('.non-rival').hide();
@@ -23,10 +26,11 @@ RivalComparison.loadRivalComparisonRow = function(team, startYear, endYear, fina
       $('.non-rival').show();
     }
   })
-  // RivalComparison.loadPreviousGamesChart(team, vsTeam, 2008, 2013, "all");
 }
 
+//load table data
 RivalComparison.loadRivalsTable = function(team, startYear, endYear, finals){
+  //first get the info from api, then smash into table
   var url = '/api/get/rivalsInformation?team='+team+ '&startYear='+startYear + '&endYear='+endYear + "&finals="+finals;
   $.get(url, function(res){
     console.log("Get rival teams info", res);
@@ -34,6 +38,7 @@ RivalComparison.loadRivalsTable = function(team, startYear, endYear, finals){
       var tBody = $('.rival-table-body');
       tBody.empty();
       res.forEach((e, index) =>{
+        //for each team, make a row
         var tr = $('<tr class="unselectable"></tr>');
         tr.addClass("clickable-row");
         tr.css("cursor", "pointer")
@@ -69,6 +74,7 @@ RivalComparison.loadRivalsTable = function(team, startYear, endYear, finals){
         tr.append(gamesWon);
         tBody.append(tr);
         if(index === 0){
+          //set the first row as the clicked row initially, and load up the graph for it
           tr.addClass("clicked-row");
           RivalComparison.loadPreviousGamesChart(RivalComparison.team,e.name,RivalComparison.startYear,RivalComparison.endYear,RivalComparison.finals);
         }
@@ -76,7 +82,7 @@ RivalComparison.loadRivalsTable = function(team, startYear, endYear, finals){
     }
 
     tBody.on('click', '.clickable-row', (e)=>{
-      // $(".clickable-row").removeClass('bg-info');
+      //set click listeners for all rows
       $(e.target.parentNode).addClass('clicked-row').siblings().removeClass('clicked-row');
       var teamName = $(e.target.parentNode).find('.td-name').text();
       RivalComparison.loadPreviousGamesChart(RivalComparison.team,teamName,RivalComparison.startYear,RivalComparison.endYear,RivalComparison.finals);
@@ -87,15 +93,13 @@ RivalComparison.loadRivalsTable = function(team, startYear, endYear, finals){
 
 }
 
-
-// /{"round":"1","date":"Saturday 5 April","hTeam":"Central Pulse","score":"33–50","homeScore":33,"awayScore":50,"aTeam":"Melbourne Vixens","venue":"TSB Bank Arena, Wellington","winningTeam":"Melbourne Vixens"}
+//build the actual chart
 RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYear, finals){
   $.get('/api/get/previousGamesVS?team='+team+'&vsTeam='+vsTeam+'&startYear='+startYear + '&endYear='+endYear+"&finals="+finals, function(res){
     console.log("got prev games info",res);
     $('.rival-chart-wrapper').empty();
-    //TeamA Points Differential VS TeamB, startYear - endYear
-    // var BWIDTH = 50;
 
+    //first make title text, set margins and get width and height qvaialabel
     var title = team +" Points Differential VS "+vsTeam + ", years "+startYear +" - "+(endYear+1);
     var data = res;
     var margin = {
@@ -107,32 +111,25 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
     width = $('.rival-chart-wrapper').width() - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
+    //create scales
     var y = d3.scaleLinear()
     .range([height, 0])
     .domain([-50,50])
-    // .domain(d3.extent(data, function(d){
-    //   return d.pointsDiff;
-    // }))
-
-    console.log(y(1))
-
 
     var x = d3.scaleBand().rangeRound([0,width]).padding(0.1)
     .domain(data.map((d, i)=>{return i;}))
 
-    // var xAxisScale = d3.scaleLinear()
-    //   .domain([0,data.length])
-    //   .range([0,data.length])
-
+    //add svg object convering full are
     var svg = d3.select('.rival-chart-wrapper').append("svg")
     .attr("id", "previous-games-chart")
     .attr("width", width+margin.left + margin.right)
     .attr("height", height+margin.bottom+margin.top);
 
+    //add graphics pane we will draw chart on within the svg
     var g = svg.append("g")
     .attr("transform", "translate("+margin.left + "," + margin.top+")");
 
-
+    //add axis to chart, adding two x axis, one at 0 and one at bottom of graph as we go negative
     g.append("g")
     .attr("class", "axis axis--x")
     .attr("transform", "translate(0," + height + ")")
@@ -155,6 +152,7 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
     .attr("text-anchor", "end")
     .text("Points diff");
 
+    //now draw bars, shifting bars with negative values below 0
     g.selectAll(".bar")
       .data(data)
       .enter().append("rect")
@@ -212,7 +210,7 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
         return h;
       })
 
-
+      //add title and axis labels
       svg.append("text")
         .attr("x", ((width + margin.left + margin.right)/2))
         .attr("y", (margin.top /2))
@@ -240,6 +238,7 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
   })
 }
 
+//used to generate the tolltip as seen int he mouse on functions of each rect
 RivalComparison.generateTooltip = function(x,y, date, venue, round, homeTeam){
   var div = $('<div></div>');
   div.append($('<div class="rival-tooltip"><span class="smallFont"><b>Date:</b> '+date+'</span></div>'))

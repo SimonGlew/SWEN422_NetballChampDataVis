@@ -15,6 +15,7 @@ function init(){
 
 }
 
+//shows tool tip on the page
 function showTooltip(left, top, html) {
   $('#tooltip').css('left', left)
   $('#tooltip').html(html)
@@ -29,6 +30,7 @@ function showTooltip(left, top, html) {
     .style("opacity", 1);
 }
 
+//hides tooltip from page
 function hideTooltip() {
   d3.select('#tooltip')
     .transition()
@@ -43,12 +45,14 @@ function hideTooltip() {
 
 }
 
+//sets a change listener to reload all graph data when we select a new team
 function setTeamSelect(){
   $("#team").change(function(e){
     reload();
   })
 }
 
+//set change listener for when we select new format
 function setFormat(){
   $('#format').change(function(e){
     reload();
@@ -57,10 +61,10 @@ function setFormat(){
 
 function setupTeamPerformance(){
   TeamPerformance.createGraph();
-  // TeamPerformance.loadPerformanceRow(team,startYear,endYear,format);
 }
 
-
+//simply initialise fdate slider with the start and end dates we want, adds listener to check if user has changed
+//to a new range and left it for more than 200ms then to reload
 function setYearSlider(){
   var handleA = $(".year-handle.lower-handle");
   var handleB = $(".year-handle.upper-handle");
@@ -94,6 +98,7 @@ function setYearSlider(){
   });
 }
 
+//check if new handle range stays for 250ms, if does, reload
 function setHandleTimer(lower, higher){
   var i = setTimeout((res)=>{
     var handleA = $(".year-handle.lower-handle");
@@ -110,6 +115,7 @@ function setReload(){
   })
 }
 
+//reload functions, updates all of the data on the page
 function reload(){
   var team = $('#team').val();
   var sliderVals = $('.year-slider').slider("values");
