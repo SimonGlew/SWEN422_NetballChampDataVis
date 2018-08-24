@@ -7,13 +7,20 @@ TeamPerformance.createGraph = function createGraph(){
 }
 
 let showingData = false;
+let startYear;
+let endYear;
+let finals;
 
-TeamPerformance.loadData = function(team, startYear, endYear, finals){
+TeamPerformance.loadData = function(team, sy, ey, f){
   console.log("Loading Performance data...");
   var url = '/api/get/teamResults?team='+team;
   $.get(url, function(res){
+    data = res;
+    startYear = sy;
+    endYear = ey;
+    finals = f;
     if(!showingData){
-      createGraph(res, startYear, endYear, finals);
+      createGraph();
     }else{
       removeData();
     }
@@ -108,7 +115,8 @@ let yearData;
 let yearRounds;
 let roundData;
 
-function createGraph(data, startYear, endYear){
+let data;
+function createGraph(){
   processData(data, startYear, endYear);
   xZoomedScale = d3.scaleLinear()
     .domain(d3.extent(years))
@@ -329,6 +337,7 @@ function removePlot(){
     .attr("d", initialLine)
     .on("end", function(){
       d3.select("#line").remove()
+      createGraph();
     })
 }
 
@@ -429,7 +438,8 @@ function zoomOut(){
 
     console.log(d3.select("#g-xAxis"))
 
-  d3.select("#g-xAxis").transition()
+  d3.select("#g-xAxis")
+    .transition()
     .duration(dur)
     .call(xAxis.ticks(years.length));
 
