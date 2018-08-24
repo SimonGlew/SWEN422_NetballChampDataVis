@@ -188,7 +188,8 @@ function addMouseListeners(data){
     .attr("height", height-2*margin)
     .attr("fill", "#FFF")
     .style("cursor", "pointer")
-    .on("mouseover", function(){2008
+    .on("mouseover", function(){
+      console.log("Mouseover?")
       d3.select(this).attr("fill", "#F5F5F5")
     })
     .on("mouseout", function(){
@@ -262,6 +263,7 @@ function plotData(data){
     .attr("stroke-linejoin", "round")
     .attr("stroke-linecap", "round")
     .attr("stroke-width", 1.5)
+    .style("pointer-events", "none")
     .attr("clip-path", "url(#marker-clip)")
     .transition()
     .duration(buildDur)
@@ -272,6 +274,17 @@ function plotData(data){
     .enter()
     .append("circle")
       .attr("class", "marker")
+      .on("mouseover", function(d){
+        console.log("Mouseover jon")
+        var div = $('<div></div>');
+        div.append($('<div><span><b>Year:</b> '+d.year+'</span></div>'))
+        div.append($('<div><span><b>Placing:</b> '+d.placing+'</span></div>'))
+        showTooltip(d3.event.x, d3.event.y, div.html());
+      })
+      .on("mouseout", function(d){
+        console.log("mouseout jon")
+        hideTooltip()
+      })
       .attr("r", 0)
       .attr("cx", function(d, i){
         return xScale(d.year);
@@ -318,6 +331,12 @@ function removeAxis(){
     .transition()
     .duration(buildDur)
     .call(xAxis.ticks(0))
+    .style("opacity", 1)
+
+  d3.select("#g-xLabelAxis")
+    .transition()
+    .duration(buildDur)
+    .style("opacity", 0)
 }
 
 function removeTitle(){
@@ -374,6 +393,11 @@ function zoomIn(year){
   updateXRoundLabelScale(year);
   xScale.domain(d3.extent(years))
 
+  d3.selectAll(".zoom-out")
+    .style("pointer-events", "none")
+  d3.selectAll(".zoom-in")
+    .style("pointer-events", "none")
+
   d3.select("#xLabel")
     .transition()
     .duration(dur/2)
@@ -428,20 +452,21 @@ function zoomIn(year){
         .duration(dur/2)
         .style("opacity", 1)
 
+      d3.selectAll(".zoom-out")
+        .style("pointer-events", "all")
+        .style("opacity", 1)
+
     });
-
-
-
-  d3.select(".zoom-out")
-    .style("pointer-events", "all")
-    .style("opacity", 1)
-  d3.select(this)
-    .style("pointer-events", "none")
-    .style("opacity", 0)
 }
 
 function zoomOut(){
   var dur = 1000;
+
+  d3.selectAll(".zoom-out")
+    .style("pointer-events", "none")
+    .style("opacity", 0)
+  d3.selectAll(".zoom-in")
+    .style("pointer-events", "none")
 
   xZoomedScale.domain(d3.extent(years))
   d3.selectAll(".roundmarker")
@@ -452,13 +477,10 @@ function zoomOut(){
     .duration(dur/2)
     .attr("r", 0)
 
-  console.log("WTTTTFFFF" + years.length)
-
   xAxis = d3.axisBottom(xScale)
     .tickFormat(d3.format(".0f"))
     .ticks(0)
 
-    console.log(d3.select("#g-xAxis"))
 
   d3.select("#g-xAxis")
     .transition()
@@ -486,6 +508,13 @@ function zoomOut(){
         .duration(dur/2)
         .style("opacity", 1)
 
+      d3.selectAll(".zoom-in")
+        .style("pointer-events", "all")
+        .style("opacity", function(){
+          console.log("Huh?")
+          return 1;
+        })
+
     })
 
   d3.select("#xLabel")
@@ -500,12 +529,7 @@ function zoomOut(){
       return d3.interpolatePath(roundLine(roundData), line(yearData));
     })
 
-  d3.selectAll(".zoom-in")
-    .style("pointer-events", "all")
-    .style("opacity", 1)
-  d3.select(this)
-    .style("pointer-events", "none")
-    .style("opacity", 0)
+
 }
 
 
@@ -533,7 +557,6 @@ function updateXRoundLabelScale(year){
   xRoundLabelScale.domain(labels).range(range)
   console.log(xRoundLabelScale);
   xLabelAxis = d3.axisBottom(xRoundLabelScale);
-
 }
 
 function updateXRoundScale(){
