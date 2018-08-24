@@ -137,6 +137,7 @@ thead{
   background-color:lightgrey;
   border-radius: 5px;
   border:3px solid black;
+  pointer-events: none;
 }
 
 #venue-comparison-container{
