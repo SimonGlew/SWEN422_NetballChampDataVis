@@ -194,11 +194,11 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
         console.log("MOUSE OVER");
         RivalComparison.generateTooltip(x,y,d.date,d.venue,d.round,d.wasHome?team:vsTeam);
       })
-      // .on("mousemove", function(d){
-      //   var x = d3.event.x;
-      //   var y = d3.event.y;
-      //   RivalComparison.generateTooltip(x,y,d.date,d.venue,d.round,d.wasHome?team:vsTeam);
-      // })
+      .on("mousemove", function(d){
+        var x = d3.event.x;
+        var y = d3.event.y;
+        RivalComparison.generateTooltip(x,y,d.date,d.venue,d.round,d.wasHome?team:vsTeam);
+      })
       .on("mouseout",function(d){
         console.log("MOUSE OUT");
 
