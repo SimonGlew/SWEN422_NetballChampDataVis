@@ -188,12 +188,6 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
         return x(i);
       })
       .attr("width", x.bandwidth())
-      .on("mouseover", function(d){
-        var x = d3.event.x;
-        var y = d3.event.y;
-        console.log("MOUSE OVER");
-        RivalComparison.generateTooltip(x,y,d.date,d.venue,d.round,d.wasHome?team:vsTeam);
-      })
       .on("mousemove", function(d){
         var x = d3.event.x;
         var y = d3.event.y;
@@ -248,9 +242,9 @@ RivalComparison.loadPreviousGamesChart = function(team, vsTeam, startYear, endYe
 
 RivalComparison.generateTooltip = function(x,y, date, venue, round, homeTeam){
   var div = $('<div></div>');
-  div.append($('<div class="rival-tooltip"><span class="small"><b>Date:</b> '+date+'</span></div>'))
-  div.append($('<div class="rival-tooltip"><span class="small"><b>Venue:</b> '+venue+'</span></div>'))
-  div.append($('<div class="rival-tooltip"><span class="small"><b>Round:</b> '+round+'</span></div>'))
-  div.append($('<div class="rival-tooltip"><span class="small"><b>Home Team:</b> '+homeTeam+'</span></div>'))
+  div.append($('<div class="rival-tooltip"><span class="smallFont"><b>Date:</b> '+date+'</span></div>'))
+  div.append($('<div class="rival-tooltip"><span class="smallFont"><b>Venue:</b> '+venue+'</span></div>'))
+  div.append($('<div class="rival-tooltip"><span class="smallFont"><b>Round:</b> '+round+'</span></div>'))
+  div.append($('<div class="rival-tooltip"><span class="smallFont"><b>Home Team:</b> '+homeTeam+'</span></div>'))
   showTooltip(x,y,div.html());
 }
