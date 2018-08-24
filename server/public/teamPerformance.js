@@ -10,10 +10,12 @@ let showingData = false;
 let startYear;
 let endYear;
 let finals;
+let team;
 
-TeamPerformance.loadData = function(team, sy, ey, f){
+TeamPerformance.loadData = function(t, sy, ey, f){
   console.log("Loading Performance data...");
-  var url = '/api/get/teamResults?team='+team;
+  var url = '/api/get/teamResults?team='+t;
+  team = t;
   $.get(url, function(res){
     data = res;
     startYear = sy;
@@ -39,7 +41,7 @@ function setupSVG(){
   let svg = d3.select(".team-performance-chart");
   //Set width and height of chart svg
   width = container.node().getBoundingClientRect().width;
-  height = 400;
+  height = 490;
   svg.attr("width", width)
     .attr("height", height);
 
@@ -101,6 +103,7 @@ function setupLabels(){
     .text("Year");
 
    d3.select(".team-performance-chart").append("text")
+    .attr("id", "title")
     .attr("transform", "translate(" + (width/2) + " ," + (margin/3) + ")")
     .style("text-anchor", "middle")
     .style("font-weight", "bold")
@@ -123,6 +126,7 @@ function createGraph(){
     .range([margin, width-margin])
   updateXRoundScale()
   updateAxis();
+  updateTitle();
   addMouseListeners(data);
   plotData(data)
   showingData = true;
@@ -153,6 +157,16 @@ function updateAxis(){
     .transition()
     .duration(buildDur)
     .call(xAxis.ticks(years.length))
+}
+
+function updateTitle(){
+  xScale.domain(d3.extent(years));
+  console.log(team)
+  d3.select("#title")
+    .text(team + " Placings, " + startYear + " - " + endYear)
+    .transition()
+    .duration(buildDur)
+    .style("opacity", 1 )
 }
 
 function addMouseListeners(data){
@@ -294,6 +308,7 @@ function plotData(data){
 function removeData(){
   removeAxis();
   removeMouseListeners();
+  removeTitle();
   removePlot();
   showingData = false;
 }
@@ -303,6 +318,13 @@ function removeAxis(){
     .transition()
     .duration(buildDur)
     .call(xAxis.ticks(0))
+}
+
+function removeTitle(){
+  d3.select("#title")
+    .transition()
+    .duration(buildDur)
+    .style("opacity", 0)
 }
 
 function removeMouseListeners(){
