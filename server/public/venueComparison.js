@@ -143,13 +143,14 @@ VenueComparison.drawGraph = function (team) {
 		.attr("text-anchor", "middle")
 		.style("font-size", "16px")
 		.style("text-decoration", "underline")
+		.style("font-weight", "bold")
 		.text('Venues that ' + team + ' played at');
 
 	g.selectAll('.winrate_label')
 		.data(VenueComparison.venueData)
 		.enter()
 		.append('text')
-		.attr('class', 'smallFont')
+		.attr('class', 'winrate-label')
 		.attr("y", function (d) {
 			return y(d.win_rate) - 5;
 		})

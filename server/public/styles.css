@@ -149,5 +149,9 @@ span.block{
 }
 
 .smallFont{
-  font-size: 0.75rem
+  font-size: 0.75rem;
+}
+
+.winrate-label{
+  font-size:11px;
 }
