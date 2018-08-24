@@ -39,9 +39,9 @@ function setupSVG(){
   //Setup groups for ordering svg elements on z axis.
   svg.append("g").attr("id", "mouse-listeners");
   svg.append("g").attr("id", "markers");
-  // let gXLabelAxis = svg.append("g");
+  svg.append("g").attr("id", "g-xLabelAxis");
   svg.append("g").attr("id", "g-yAxis");
-  svg.append("g").attr("id", "g-xAxis");;
+  svg.append("g").attr("id", "g-xAxis");
 }
 
 let xScale, xAxis;
@@ -57,7 +57,7 @@ function setupAxis(){
     .tickFormat(d3.format(".0f"))
     .ticks(0)
 
-  d3.select("#g-xAxis").attr("class", "xAxis")
+  d3.select("#g-xAxis")
     .attr("transform", "translate(0, " + (height - margin) + ")")
     .call(xAxis);
 
@@ -72,6 +72,10 @@ function setupAxis(){
   d3.select("#g-yAxis")
     .attr("transform", "translate(" + margin + ", 0)")
     .call(yAxis);
+
+  d3.select("#g-xLabelAxis").attr("class", "xLabelAxis")
+    .attr("transform", "translate(0, " + (height - margin) + ")")
+    .style("opacity", 0)
 }
 
 function setupLabels(){
@@ -137,7 +141,7 @@ function processData(data, startYear, endYear){
 
 function updateAxis(){
   xScale.domain(d3.extent(years));
-  d3.select("#g-xAxis").attr("class", "xAxis")
+  d3.select("#g-xAxis")
     .transition()
     .duration(buildDur)
     .call(xAxis.ticks(years.length))
@@ -287,7 +291,7 @@ function removeData(){
 }
 
 function removeAxis(){
-  d3.select("#g-xAxis").attr("class", "xAxis")
+  d3.select("#g-xAxis")
     .transition()
     .duration(buildDur)
     .call(xAxis.ticks(0))
@@ -336,16 +340,19 @@ function zoomIn(year){
 
   xZoomedScale.domain([year-1, year])
   updateXRoundScale();
-  updateXRoundLabelScale();
+  updateXRoundLabelScale(year);
   xScale.domain(d3.extent(years))
 
   d3.select("#xLabel")
     .transition()
     .duration(dur/2)
     .style("opacity", 0)
-  //
-  // gXLabelAxis.transition()
-  //   .call(xLabelAxis);
+
+  d3.select("#g-xLabelAxis").transition()
+    .call(xLabelAxis);
+
+  xAxis = d3.axisBottom(xZoomedScale)
+    .tickFormat(d3.format(".0f"))
 
   d3.select("#g-xAxis").transition()
     .duration(dur)
@@ -375,21 +382,21 @@ function zoomIn(year){
         .duration(dur/2)
         .attr("r", 4)
 
-    //   gXLabelAxis.transition()
-    //     .duration(dur/2)
-    //     .style("opacity", 1);
-    //
-    //   gXAxis.transition()
-    //     .duration(dur/2)
-    //     .style("opacity", 0);
-    //
+      d3.select("#g-xLabelAxis")
+        .transition()
+        .duration(dur/2)
+        .style("opacity", 1);
+
+      d3.select("#g-xAxis").transition()
+        .duration(dur/2)
+        .style("opacity", 0);
+
       d3.select("#xLabel")
         .text("Rounds (" +  year + ")")
         .transition()
         .duration(dur/2)
         .style("opacity", 1)
-    //
-    //
+
     });
 
 
@@ -414,17 +421,25 @@ function zoomOut(){
     .duration(dur/2)
     .attr("r", 0)
 
-  // gXAxis.transition()
-  //   .duration(dur)
-  //   .call(xAxis.ticks(years.length));
-  //
-  // gXLabelAxis.transition()
-  //   .duration(dur/2)
-  //   .style("opacity", 0);
-  //
-  // gXAxis.transition()
-  //   .duration(dur/2)
-  //   .style("opacity", 1);
+  console.log("WTTTTFFFF" + years.length)
+
+  xAxis = d3.axisBottom(xScale)
+    .tickFormat(d3.format(".0f"))
+    .ticks(0)
+
+    console.log(d3.select("#g-xAxis"))
+
+  d3.select("#g-xAxis").transition()
+    .duration(dur)
+    .call(xAxis.ticks(years.length));
+
+  d3.select("#g-xLabelAxis").transition()
+    .duration(dur/2)
+    .style("opacity", 0);
+
+  d3.select("#g-xAxis").transition()
+    .duration(dur/2)
+    .style("opacity", 1);
 
   d3.selectAll(".marker")
     .transition()
@@ -461,76 +476,20 @@ function zoomOut(){
     .style("opacity", 0)
 }
 
-function createGraph2(data){
-  var zoomedIn = false;
-  //TODO load this from data
-
-  console.log(data)
-  years = [];
-
-
-  console.log("Year Data", yearData)
-
-  console.log("Years: " + years)
-  console.log("Year Rounds: " + yearRounds)
-  console.log(roundData);
-  //TODO load this from data? Maybe?
-  numTeams = 10;
-  numRounds = 17;
-
-  var currYear = 0;
-
-  //Define groups for svg elements (Useful for defining z-order)
-
-
-  //Set scales
-
-
-
-
-
-
-
-  //Add axis
-
-
-  gXLabelAxis.attr("class", "xLabelAxis")
-    .attr("transform", "translate(0, " + (height - margin) + ")")
-    .style("opacity", 0)
-
-
-
-  let xLabelAxis = d3.axisBottom(xRoundLabelScale);
-
-  // let xRoundAxis = d3.axisBottom(xRoundScale)
-  //   .tickFormat(d3.format(".0f"))
-  //   .ticks(16)
-
-
-
-
-
-
-
-
-
-
-
-    //Add markers for data
-
-
-
-}
 
 let xRoundScale;
+let xRoundAxis;
+let xLabelAxis;
+
 
 let xRoundLabelScale = d3.scaleOrdinal();
 
-function updateXRoundLabelScale(i){
-  year = years[i]
+function updateXRoundLabelScale(year){
+  for(var y = 0; y != years.length; y++){
+    var i = y;
+  }
   var labels = [year - 1];
   var range = [margin];
-  console.log(yearRounds)
   for(var j = 1; j < yearRounds[i]; j++){
     labels.push(j);
     range.push(margin + (width-2*margin)/yearRounds[i]*j)
@@ -541,6 +500,8 @@ function updateXRoundLabelScale(i){
   console.log("range", range);
   xRoundLabelScale.domain(labels).range(range)
   console.log(xRoundLabelScale);
+  xLabelAxis = d3.axisBottom(xRoundLabelScale);
+
 }
 
 function updateXRoundScale(){
@@ -559,4 +520,11 @@ function updateXRoundScale(){
   xRoundScale = d3.scaleLinear()
     .domain(roundsDomain)
     .range(roundsRange)
+
+  xRoundAxis = d3.axisBottom(xRoundScale)
+    .tickFormat(d3.format(".0f"))
+    .ticks(16)
+
+
+
 }

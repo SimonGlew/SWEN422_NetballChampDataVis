@@ -140,8 +140,3 @@ VenueComparison.drawGraph = function (team) {
 		})
 
 }
-
-
-
-
-
