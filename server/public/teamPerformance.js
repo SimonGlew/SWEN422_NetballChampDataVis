@@ -161,7 +161,6 @@ function updateAxis(){
 
 function updateTitle(){
   xScale.domain(d3.extent(years));
-  console.log(team)
   d3.select("#title")
     .text(team + " Placings, " + startYear + " - " + endYear)
     .transition()
@@ -189,7 +188,6 @@ function addMouseListeners(data){
     .attr("fill", "#FFF")
     .style("cursor", "pointer")
     .on("mouseover", function(){
-      console.log("Mouseover?")
       d3.select(this).attr("fill", "#F5F5F5")
     })
     .on("mouseout", function(){
@@ -274,12 +272,12 @@ function plotData(data){
     .enter()
     .append("circle")
       .attr("class", "marker")
-      .on("mouseover", function(d){
+      .on("mousemove", function (d) {
         var div = $('<div></div>');
-        div.append($('<div><span><b>Year:</b> '+d.year+'</span></div>'))
-        div.append($('<div><span><b>Placing:</b> '+d.placement+'</span></div>'))
+        div.append($('<div><span class="smallFont"><b>Year:</b> '+d.year+'</span></div>'))
+        div.append($('<div><span class="smallFont"><b>Placing:</b> '+d.placement+'</span></div>'))
         showTooltip(d3.event.x, d3.event.y, div.html());
-      })
+  		})
       .on("mouseout", function(d){
         hideTooltip()
       })
@@ -312,10 +310,10 @@ function plotData(data){
           return yScale(d.placement);
         })
         .attr("fill", "#5697ff")
-        .on("mouseover", function(d){
+        .on("mousemove", function (d) {
           var div = $('<div></div>');
-          div.append($('<div><span><b>Round:</b> '+d.round+'</span></div>'))
-          div.append($('<div><span><b>Placing:</b> '+d.placement+'</span></div>'))
+          div.append($('<div><span class="smallFont"><b>Round:</b> '+d.round+'</span></div>'))
+          div.append($('<div><span class="smallFont"><b>Placing:</b> '+d.placement+'</span></div>'))
           showTooltip(d3.event.x, d3.event.y, div.html());
         })
         .on("mouseout", function(){
@@ -393,8 +391,6 @@ let yearIndex;
 
 function zoomIn(year, index){
   yearIndex = index;
-  console.log("Zoom into " + year)
-
   currYear = year;
   var dur = 1000;
 
@@ -442,7 +438,6 @@ function zoomIn(year, index){
       d3.selectAll(".roundmarker")
         .style("fill", function(d, i){
           if(d.round > yearRounds[yearIndex] - 3){
-            console.log(finals)
             if(finals == "finals"){
               return "#33d6ad";
             }
@@ -500,13 +495,18 @@ function zoomOut(){
 
   xAxis = d3.axisBottom(xScale)
     .tickFormat(d3.format(".0f"))
-    .ticks(0)
+    .ticks(years.length)
+
+  console.log("YEARS LENGTH " + years.length)
+  // xAxis.ticks(0)
+
+  console.log(xAxis);
 
 
   d3.select("#g-xAxis")
     .transition()
     .duration(dur)
-    .call(xAxis.ticks(years.length));
+    .call(xAxis);
 
   d3.select("#g-xLabelAxis").transition()
     .duration(dur/2)
@@ -532,7 +532,6 @@ function zoomOut(){
       d3.selectAll(".zoom-in")
         .style("pointer-events", "all")
         .style("opacity", function(){
-          console.log("Huh?")
           return 1;
         })
 
@@ -573,10 +572,7 @@ function updateXRoundLabelScale(year){
   }
   labels.push(year);
   range.push(width - margin);
-  console.log("labels", labels);
-  console.log("range", range);
   xRoundLabelScale.domain(labels).range(range)
-  console.log(xRoundLabelScale);
   xLabelAxis = d3.axisBottom(xRoundLabelScale);
 }
 
@@ -590,8 +586,6 @@ function updateXRoundScale(){
     roundsDomain.push(roundCount);
     roundCount += yearRounds[i];
   }
-  console.log("ROUNDS DOMAIN:", roundsDomain)
-  console.log("ROUNDS RANGE:", roundsRange)
 
   xRoundScale = d3.scaleLinear()
     .domain(roundsDomain)
