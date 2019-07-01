@@ -1,7 +1,7 @@
 {
   "name": "swen422a1",
   "version": "1.0.0",
-  "description": "Jon is Daddy",
+  "description": "",
   "main": "server/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@gitlab.ecs.vuw.ac.nz:glewsimo/SWEN422A1.git"
+    "url": ""
   },
   "author": "",
   "license": "ISC",
